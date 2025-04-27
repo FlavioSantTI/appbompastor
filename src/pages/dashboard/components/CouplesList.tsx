@@ -2,28 +2,13 @@
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { edit, trash2 } from 'lucide-react';
+import CouplesTable from './CouplesTable';
+import SearchBar from './SearchBar';
 import CoupleDialog from './CoupleDialog';
+import type { Couple } from './types';
 
 interface CouplesListProps {
   searchTerm: string;
-}
-
-interface Couple {
-  id_inscricao: number;
-  codigo_casal: number;
-  esposa: { nome_completo: string } | null;
-  esposo: { nome_completo: string } | null;
-  data_hora_inscricao: string;
 }
 
 export default function CouplesList({ searchTerm }: CouplesListProps) {
@@ -51,7 +36,15 @@ export default function CouplesList({ searchTerm }: CouplesListProps) {
         .order('data_hora_inscricao', { ascending: false });
 
       if (error) throw error;
-      setCouples(data || []);
+
+      // Transform the data to match our Couple type
+      const transformedData = data.map((item) => ({
+        ...item,
+        esposa: Array.isArray(item.esposa) ? item.esposa[0] : item.esposa,
+        esposo: Array.isArray(item.esposo) ? item.esposo[0] : item.esposo,
+      }));
+
+      setCouples(transformedData);
     } catch (error) {
       console.error('Error fetching couples:', error);
       toast({
@@ -95,47 +88,11 @@ export default function CouplesList({ searchTerm }: CouplesListProps) {
 
   return (
     <>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Código</TableHead>
-            <TableHead>Esposa</TableHead>
-            <TableHead>Esposo</TableHead>
-            <TableHead>Data de Inscrição</TableHead>
-            <TableHead>Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {couples.map((couple) => (
-            <TableRow key={couple.id_inscricao}>
-              <TableCell>{couple.codigo_casal}</TableCell>
-              <TableCell>{couple.esposa?.nome_completo}</TableCell>
-              <TableCell>{couple.esposo?.nome_completo}</TableCell>
-              <TableCell>
-                {new Date(couple.data_hora_inscricao).toLocaleDateString('pt-BR')}
-              </TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setSelectedCouple(couple)}
-                  >
-                    <edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(couple.id_inscricao)}
-                  >
-                    <trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <CouplesTable 
+        couples={couples}
+        onEdit={setSelectedCouple}
+        onDelete={handleDelete}
+      />
 
       <CoupleDialog
         couple={selectedCouple}
