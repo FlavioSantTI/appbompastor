@@ -1,49 +1,57 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import MainLayout from '@/layout/MainLayout';
-import FormContainer from '@/features/form/FormContainer';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
-const Index = () => {
+const Index: React.FC = () => {
+  const { user } = useAuth();
+
   return (
     <MainLayout>
-      <div className="container mx-auto">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 flutter-gradient bg-clip-text text-transparent animate-fade-in">
-            Formulário de Inscrição Matrimonial
-          </h1>
-          <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto animate-slide-in">
-            Preencha o formulário abaixo com todas as informações do casal para inscrição no evento.
-            Todos os dados são confidenciais e serão usados apenas para fins organizacionais.
+      <div className="container mx-auto py-16 px-4 space-y-12">
+        <section className="text-center space-y-4">
+          <h1 className="text-4xl md:text-6xl font-bold">ECC - Encontro de Casais com Cristo</h1>
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            Sistema de gerenciamento de inscrições para o encontro de casais
           </p>
-        </div>
-        
-        <FormContainer />
-        
-        <div className="mt-16 text-center">
-          <h2 className="text-2xl font-semibold mb-4">Dúvidas Frequentes</h2>
-          <div className="max-w-3xl mx-auto">
-            <div className="flutter-card p-6 mb-4">
-              <h3 className="font-semibold mb-2">O que acontece após a inscrição?</h3>
-              <p className="text-slate-600 dark:text-slate-400">
-                Após o envio do formulário, nossa equipe irá revisar suas informações e você receberá um email de confirmação em até 48 horas.
-              </p>
-            </div>
-            
-            <div className="flutter-card p-6 mb-4">
-              <h3 className="font-semibold mb-2">Posso editar minha inscrição depois?</h3>
-              <p className="text-slate-600 dark:text-slate-400">
-                Sim! Após efetuar o login no sistema, você terá acesso para editar suas informações até 7 dias antes do evento.
-              </p>
-            </div>
-            
-            <div className="flutter-card p-6">
-              <h3 className="font-semibold mb-2">Como funciona o serviço de creche?</h3>
-              <p className="text-slate-600 dark:text-slate-400">
-                Oferecemos serviço de creche para crianças até 12 anos. É importante informar corretamente a idade das crianças para que possamos organizar atividades adequadas.
-              </p>
-            </div>
+
+          <div className="flex justify-center gap-4 pt-4">
+            {user ? (
+              <Link to="/dashboard">
+                <Button size="lg">Acessar Dashboard</Button>
+              </Link>
+            ) : (
+              <Link to="/auth">
+                <Button size="lg">Área Restrita</Button>
+              </Link>
+            )}
           </div>
-        </div>
+        </section>
+
+        <section className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="space-y-2 p-6 bg-white dark:bg-gray-950 rounded-lg shadow">
+            <h2 className="text-xl font-bold">Gerenciamento de Inscrições</h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Cadastre e gerencie inscrições de casais para o encontro.
+            </p>
+          </div>
+
+          <div className="space-y-2 p-6 bg-white dark:bg-gray-950 rounded-lg shadow">
+            <h2 className="text-xl font-bold">Acompanhamento</h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Acompanhe o status das inscrições e gerencie os dados dos casais.
+            </p>
+          </div>
+
+          <div className="space-y-2 p-6 bg-white dark:bg-gray-950 rounded-lg shadow">
+            <h2 className="text-xl font-bold">Relatórios</h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Gere relatórios e estatísticas sobre os casais inscritos.
+            </p>
+          </div>
+        </section>
       </div>
     </MainLayout>
   );
