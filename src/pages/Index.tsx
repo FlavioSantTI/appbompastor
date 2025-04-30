@@ -4,9 +4,10 @@ import { Link } from 'react-router-dom';
 import MainLayout from '@/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { Loader2 } from 'lucide-react';
 
 const Index: React.FC = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   return (
     <MainLayout>
@@ -18,7 +19,12 @@ const Index: React.FC = () => {
           </p>
 
           <div className="flex justify-center gap-4 pt-4">
-            {user ? (
+            {loading ? (
+              <Button size="lg" disabled>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Carregando...
+              </Button>
+            ) : user ? (
               <Link to="/dashboard">
                 <Button size="lg">Acessar Dashboard</Button>
               </Link>
