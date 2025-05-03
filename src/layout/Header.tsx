@@ -13,7 +13,7 @@ const Header: React.FC = () => {
     <header className="bg-white dark:bg-gray-950 shadow-sm">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link to="/" className="text-2xl font-bold text-primary">
-          ECC - Encontro de Casais
+          Encontro de Casais em Nova União com Bom Pastor
         </Link>
         <nav className="flex items-center gap-4">
           <Link to="/" className="text-gray-800 dark:text-gray-200 hover:text-primary">

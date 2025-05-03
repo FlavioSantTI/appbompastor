@@ -14,7 +14,7 @@ const Index: React.FC = () => {
     <MainLayout>
       <div className="container mx-auto py-16 px-4 space-y-12">
         <section className="text-center space-y-4">
-          <h1 className="text-4xl md:text-6xl font-bold">ECC - Encontro de Casais com Cristo</h1>
+          <h1 className="text-4xl md:text-6xl font-bold">Encontro de Casais em Nova União com Bom Pastor</h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Sistema de gerenciamento de inscrições para o encontro de casais
           </p>
