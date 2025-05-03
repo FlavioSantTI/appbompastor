@@ -4,10 +4,20 @@ import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+type UserRole = 'admin' | 'user';
+
+type Profile = {
+  id: string;
+  role: UserRole;
+  created_at?: string;
+};
+
 type AuthContextType = {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  profile: Profile | null;
+  isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any | null }>;
   signUp: (email: string, password: string) => Promise<{ error: any | null }>;
   signOut: () => Promise<void>;
@@ -19,7 +29,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const { toast } = useToast();
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (error) {
+        console.error('Erro ao buscar perfil:', error);
+        return;
+      }
+      
+      setProfile(data);
+    } catch (error) {
+      console.error('Erro ao buscar perfil:', error);
+    }
+  };
 
   useEffect(() => {
     // Configurar listener para mudanças de autenticação
@@ -27,6 +57,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+
+        // Se tiver um usuário autenticado, buscar o perfil
+        if (session?.user) {
+          fetchProfile(session.user.id);
+        } else {
+          setProfile(null);
+        }
 
         if (event === 'SIGNED_IN') {
           toast({
@@ -46,6 +83,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      // Se tiver um usuário autenticado, buscar o perfil
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      }
+      
       setLoading(false);
     });
 
@@ -70,6 +113,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     session,
     loading,
+    profile,
+    isAdmin: profile?.role === 'admin',
     signIn,
     signUp,
     signOut,

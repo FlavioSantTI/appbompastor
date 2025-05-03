@@ -9,12 +9,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 
 export default function UserMenu() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, profile, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -36,6 +37,11 @@ export default function UserMenu() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <User className="h-5 w-5" />
+          {isAdmin && (
+            <span className="absolute -right-1 -top-1">
+              <Shield className="h-4 w-4 text-primary" />
+            </span>
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -45,6 +51,11 @@ export default function UserMenu() {
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
+            {profile && (
+              <Badge className="w-fit mt-1" variant={isAdmin ? "default" : "secondary"}>
+                {profile.role === 'admin' ? 'Administrador' : 'Usuário'}
+              </Badge>
+            )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

@@ -4,10 +4,11 @@ import { Link } from 'react-router-dom';
 import MainLayout from '@/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShieldAlert } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const Index: React.FC = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
 
   return (
     <MainLayout>
@@ -25,9 +26,20 @@ const Index: React.FC = () => {
                 Carregando...
               </Button>
             ) : user ? (
-              <Link to="/dashboard">
-                <Button size="lg">Acessar Dashboard</Button>
-              </Link>
+              isAdmin ? (
+                <Link to="/dashboard">
+                  <Button size="lg">Acessar Dashboard</Button>
+                </Link>
+              ) : (
+                <Alert className="max-w-md mx-auto">
+                  <ShieldAlert className="h-4 w-4" />
+                  <AlertTitle>Acesso limitado</AlertTitle>
+                  <AlertDescription>
+                    Você está logado, mas não possui permissões de administrador.
+                    Entre em contato com um administrador para solicitar acesso.
+                  </AlertDescription>
+                </Alert>
+              )
             ) : (
               <Link to="/auth">
                 <Button size="lg">Área Restrita</Button>

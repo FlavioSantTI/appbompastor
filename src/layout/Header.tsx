@@ -2,11 +2,10 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import UserMenu from './UserMenu';
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Header: React.FC = () => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   
   return (
@@ -19,7 +18,7 @@ const Header: React.FC = () => {
           <Link to="/" className="text-gray-800 dark:text-gray-200 hover:text-primary">
             Início
           </Link>
-          {user && (
+          {user && isAdmin && (
             <Link to="/dashboard" className="text-gray-800 dark:text-gray-200 hover:text-primary">
               Dashboard
             </Link>

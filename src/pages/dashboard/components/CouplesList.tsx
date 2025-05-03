@@ -5,6 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import CouplesTable from './CouplesTable';
 import { Couple } from './types';
+import { useAuth } from '@/contexts/AuthContext';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface CouplesListProps {
   searchTerm: string;
@@ -12,12 +15,22 @@ interface CouplesListProps {
 
 export default function CouplesList({ searchTerm }: CouplesListProps) {
   const { toast } = useToast();
+  const { isAdmin } = useAuth();
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedCouple, setSelectedCouple] = useState<Couple | null>(null);
 
   const fetchCouples = async () => {
     try {
+      if (!isAdmin) {
+        toast({
+          title: "Acesso negado",
+          description: "Você não tem permissão para acessar estes dados.",
+          variant: "destructive",
+        });
+        return [];
+      }
+
       let query = supabase
         .from('inscricoes')
         .select(`
@@ -68,6 +81,15 @@ export default function CouplesList({ searchTerm }: CouplesListProps) {
 
   const handleDelete = async (id: number) => {
     try {
+      if (!isAdmin) {
+        toast({
+          title: "Acesso negado",
+          description: "Você não tem permissão para esta ação.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       setIsDeleting(id);
 
       const { error } = await supabase
@@ -95,6 +117,15 @@ export default function CouplesList({ searchTerm }: CouplesListProps) {
   };
 
   const handleEdit = (couple: Couple) => {
+    if (!isAdmin) {
+      toast({
+        title: "Acesso negado",
+        description: "Você não tem permissão para esta ação.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setSelectedCouple(couple);
     setDialogOpen(true);
   };
@@ -111,6 +142,19 @@ export default function CouplesList({ searchTerm }: CouplesListProps) {
       String(couple.codigo_casal).includes(searchTermLower)
     );
   });
+
+  if (!isAdmin) {
+    return (
+      <Alert className="mt-6" variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Acesso negado</AlertTitle>
+        <AlertDescription>
+          Você não possui permissão para acessar o gerenciamento de inscrições.
+          Entre em contato com um administrador para obter acesso.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div>
