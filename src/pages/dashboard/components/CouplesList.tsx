@@ -8,6 +8,7 @@ import { Couple } from './types';
 import { useAuth } from '@/contexts/AuthContext';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import CoupleDialog from './CoupleDialog';
 
 interface CouplesListProps {
   searchTerm: string;
@@ -130,6 +131,11 @@ export default function CouplesList({ searchTerm }: CouplesListProps) {
     setDialogOpen(true);
   };
 
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedCouple(null);
+  };
+
   // Filtrar casais baseado no termo de busca
   const filteredCouples = couples.filter((couple) => {
     const searchTermLower = searchTerm.toLowerCase();
@@ -165,6 +171,14 @@ export default function CouplesList({ searchTerm }: CouplesListProps) {
         onDelete={handleDelete}
         isDeleting={isDeleting}
       />
+      
+      {dialogOpen && (
+        <CoupleDialog
+          couple={selectedCouple}
+          onClose={handleCloseDialog}
+          onUpdate={refetch}
+        />
+      )}
     </div>
   );
 }
