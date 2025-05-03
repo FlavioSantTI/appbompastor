@@ -11,73 +11,198 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { formatDate } from '@/core/validation';
+import Stepper from '@/features/form/components/Stepper';
+import WifeForm, { WifeData } from '@/features/form/components/WifeForm';
+import HusbandForm, { HusbandData } from '@/features/form/components/HusbandForm';
+import CoupleForm, { CoupleData } from '@/features/form/components/CoupleForm';
+import ReviewForm from '@/features/form/components/ReviewForm';
+import { FORM_SECTIONS } from '@/core/constants';
+import { validateRequired, validateEmail, validatePhone } from '@/core/validation';
+import { Check } from 'lucide-react';
 
-interface CoupleFormProps {
+interface CoupleFormDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
-export default function CoupleForm({ open, onClose }: CoupleFormProps) {
+const steps = [
+  { id: 1, name: FORM_SECTIONS.WIFE },
+  { id: 2, name: FORM_SECTIONS.HUSBAND },
+  { id: 3, name: FORM_SECTIONS.COUPLE },
+  { id: 4, name: FORM_SECTIONS.REVIEW },
+];
+
+export default function CoupleFormDialog({ open, onClose }: CoupleFormDialogProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    // Dados do casal
-    codigoCasal: '',
-    paroquiaFrequentada: '',
-    tempoUniao: '',
-    
-    // Dados da esposa
-    esposa: {
-      nomeCompleto: '',
-      dataNascimento: '',
-      telefone: '',
-      email: '',
-    },
-    
-    // Dados do esposo
-    esposo: {
-      nomeCompleto: '',
-      dataNascimento: '',
-      telefone: '',
-      email: '',
-    }
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  
+  const [wifeData, setWifeData] = useState<WifeData>({
+    name: '',
+    nickname: '',
+    birthdate: '',
+    phone: '',
+    email: '',
+    sacraments: [],
+    movements: [],
+    newUnion: 'no',
   });
 
-  const handleChange = (field: string, value: string) => {
-    const [section, subfield] = field.includes('.') 
-      ? field.split('.') 
-      : [field, null];
+  const [husbandData, setHusbandData] = useState<HusbandData>({
+    name: '',
+    nickname: '',
+    birthdate: '',
+    phone: '',
+    email: '',
+    sacraments: [],
+    movements: [],
+    newUnion: 'no',
+  });
 
-    if (subfield) {
-      setFormData(prev => ({
-        ...prev,
-        [section]: {
-          ...prev[section as 'esposa' | 'esposo'],
-          [subfield]: value
-        }
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [section]: value
-      }));
+  const [coupleData, setCoupleData] = useState<CoupleData>({
+    address: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    unionTime: '',
+    parish: '',
+    children: [],
+    emergencyContact: '',
+    emergencyPhone: '',
+  });
+
+  const validateWifeData = () => {
+    return (
+      validateRequired(wifeData.name) &&
+      validateRequired(wifeData.nickname) &&
+      validateRequired(wifeData.birthdate) &&
+      validateRequired(wifeData.phone) && validatePhone(wifeData.phone) &&
+      validateRequired(wifeData.email) && validateEmail(wifeData.email)
+    );
+  };
+
+  const validateHusbandData = () => {
+    return (
+      validateRequired(husbandData.name) &&
+      validateRequired(husbandData.nickname) &&
+      validateRequired(husbandData.birthdate) &&
+      validateRequired(husbandData.phone) && validatePhone(husbandData.phone) &&
+      validateRequired(husbandData.email) && validateEmail(husbandData.email)
+    );
+  };
+
+  const validateCoupleData = () => {
+    return (
+      validateRequired(coupleData.address) &&
+      validateRequired(coupleData.city) &&
+      validateRequired(coupleData.state) &&
+      validateRequired(coupleData.zipCode) &&
+      validateRequired(coupleData.unionTime) &&
+      validateRequired(coupleData.parish) &&
+      validateRequired(coupleData.emergencyContact) &&
+      validateRequired(coupleData.emergencyPhone)
+    );
+  };
+
+  const nextStep = () => {
+    let canContinue = false;
+    
+    if (currentStep === 1) {
+      canContinue = validateWifeData();
+      if (!canContinue) {
+        toast({
+          title: "Dados incompletos",
+          description: "Por favor, preencha todos os campos obrigatórios da esposa corretamente.",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else if (currentStep === 2) {
+      canContinue = validateHusbandData();
+      if (!canContinue) {
+        toast({
+          title: "Dados incompletos",
+          description: "Por favor, preencha todos os campos obrigatórios do esposo corretamente.",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else if (currentStep === 3) {
+      canContinue = validateCoupleData();
+      if (!canContinue) {
+        toast({
+          title: "Dados incompletos",
+          description: "Por favor, preencha todos os campos obrigatórios do casal corretamente.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    
+    if (currentStep < 4) {
+      setCurrentStep(currentStep + 1);
     }
   };
 
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const resetForm = () => {
+    setCurrentStep(1);
+    setWifeData({
+      name: '',
+      nickname: '',
+      birthdate: '',
+      phone: '',
+      email: '',
+      sacraments: [],
+      movements: [],
+      newUnion: 'no',
+    });
+    setHusbandData({
+      name: '',
+      nickname: '',
+      birthdate: '',
+      phone: '',
+      email: '',
+      sacraments: [],
+      movements: [],
+      newUnion: 'no',
+    });
+    setCoupleData({
+      address: '',
+      city: '',
+      state: '',
+      zipCode: '',
+      unionTime: '',
+      parish: '',
+      children: [],
+      emergencyContact: '',
+      emergencyPhone: '',
+    });
+    setTermsAccepted(false);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
   const handleSubmit = async () => {
-    if (!formData.codigoCasal || !formData.esposa.nomeCompleto || !formData.esposo.nomeCompleto) {
+    if (!termsAccepted) {
       toast({
-        title: "Dados incompletos",
-        description: "Por favor, preencha pelo menos o código do casal e os nomes dos cônjuges.",
+        title: "Termos não aceitos",
+        description: "Por favor, aceite os termos para finalizar a inscrição.",
         variant: "destructive",
       });
       return;
     }
-
+    
     setIsSubmitting(true);
 
     try {
@@ -85,10 +210,12 @@ export default function CoupleForm({ open, onClose }: CoupleFormProps) {
       const { data: inscricaoData, error: inscricaoError } = await supabase
         .from('inscricoes')
         .insert({
-          codigo_casal: parseInt(formData.codigoCasal),
-          paroquia_frequentada: formData.paroquiaFrequentada || null,
-          tempo_uniao: formData.tempoUniao ? parseInt(formData.tempoUniao) : null,
-          data_hora_inscricao: new Date().toISOString()
+          codigo_casal: Math.floor(1000 + Math.random() * 9000), // Código aleatório
+          paroquia_frequentada: coupleData.parish,
+          tempo_uniao: coupleData.unionTime ? parseInt(coupleData.unionTime) : null,
+          data_hora_inscricao: new Date().toISOString(),
+          contato_emergencia: coupleData.emergencyContact,
+          telefone_emergencia: coupleData.emergencyPhone
         })
         .select();
 
@@ -96,45 +223,80 @@ export default function CoupleForm({ open, onClose }: CoupleFormProps) {
       
       const inscricaoId = inscricaoData[0].id_inscricao;
       
-      // 2. Inserir dados da esposa
-      const { error: esposaError } = await supabase
+      // 2. Inserir endereço
+      const { error: enderecoError } = await supabase
+        .from('enderecos')
+        .insert({
+          id_inscricao: inscricaoId,
+          endereco_completo: coupleData.address,
+          cidade: coupleData.city,
+          estado: coupleData.state,
+          cep: coupleData.zipCode
+        });
+      
+      if (enderecoError) throw enderecoError;
+      
+      // 3. Inserir dados da esposa
+      const { data: esposaData, error: esposaError } = await supabase
         .from('pessoas')
         .insert({
           id_inscricao: inscricaoId,
-          nome_completo: formData.esposa.nomeCompleto,
-          data_nascimento: formData.esposa.dataNascimento || null,
-          telefone: formData.esposa.telefone || null,
-          email: formData.esposa.email || null,
+          nome_completo: wifeData.name,
+          nome_cracha: wifeData.nickname,
+          data_nascimento: wifeData.birthdate,
+          telefone: wifeData.phone,
+          email: wifeData.email,
           tipo_conjuge: 'esposa',
-          sexo: 'F'
-        });
+          sexo: 'F',
+          nova_uniao: wifeData.newUnion === 'yes'
+        })
+        .select();
       
       if (esposaError) throw esposaError;
       
-      // 3. Inserir dados do esposo
-      const { error: esposoError } = await supabase
+      // 4. Inserir dados do esposo
+      const { data: esposoData, error: esposoError } = await supabase
         .from('pessoas')
         .insert({
           id_inscricao: inscricaoId,
-          nome_completo: formData.esposo.nomeCompleto,
-          data_nascimento: formData.esposo.dataNascimento || null,
-          telefone: formData.esposo.telefone || null,
-          email: formData.esposo.email || null,
+          nome_completo: husbandData.name,
+          nome_cracha: husbandData.nickname,
+          data_nascimento: husbandData.birthdate,
+          telefone: husbandData.phone,
+          email: husbandData.email,
           tipo_conjuge: 'esposo',
-          sexo: 'M'
-        });
+          sexo: 'M',
+          nova_uniao: husbandData.newUnion === 'yes'
+        })
+        .select();
       
       if (esposoError) throw esposoError;
       
+      // 5. Inserir filhos, se houver
+      if (coupleData.children.length > 0) {
+        const filhosData = coupleData.children.map(child => ({
+          id_inscricao: inscricaoId,
+          nome: child.name,
+          idade: parseInt(child.age),
+          necessita_creche: child.needsDaycare
+        }));
+        
+        const { error: filhosError } = await supabase
+          .from('filhos')
+          .insert(filhosData);
+        
+        if (filhosError) throw filhosError;
+      }
+      
       toast({
         title: "Inscrição realizada com sucesso!",
-        description: `O casal foi cadastrado com o código ${formData.codigoCasal}.`
+        description: `A inscrição do casal foi cadastrada com sucesso.`
       });
       
       // Atualizar a lista de casais
       queryClient.invalidateQueries({ queryKey: ['couples'] });
       
-      onClose();
+      handleClose();
     } catch (error: any) {
       console.error('Erro ao cadastrar casal:', error);
       toast({
@@ -147,155 +309,75 @@ export default function CoupleForm({ open, onClose }: CoupleFormProps) {
     }
   };
 
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return <WifeForm data={wifeData} onChange={setWifeData} />;
+      case 2:
+        return <HusbandForm data={husbandData} onChange={setHusbandData} />;
+      case 3:
+        return <CoupleForm data={coupleData} onChange={setCoupleData} />;
+      case 4:
+        return (
+          <ReviewForm
+            wifeData={wifeData}
+            husbandData={husbandData}
+            coupleData={coupleData}
+            termsAccepted={termsAccepted}
+            onAcceptTerms={setTermsAccepted}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Cadastrar Novo Casal</DialogTitle>
+          <DialogTitle className="text-2xl">Formulário de Inscrição</DialogTitle>
         </DialogHeader>
         
-        <div className="grid gap-6 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border rounded-lg bg-gray-50 dark:bg-gray-900">
-            <h3 className="col-span-full text-lg font-medium border-b pb-2 mb-2">Dados do Casal</h3>
-            
-            <div>
-              <Label htmlFor="codigoCasal">Código do Casal*</Label>
-              <Input 
-                id="codigoCasal" 
-                value={formData.codigoCasal} 
-                onChange={(e) => handleChange('codigoCasal', e.target.value)}
-                type="number"
-                placeholder="Ex: 123"
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="paroquiaFrequentada">Paróquia</Label>
-              <Input 
-                id="paroquiaFrequentada" 
-                value={formData.paroquiaFrequentada} 
-                onChange={(e) => handleChange('paroquiaFrequentada', e.target.value)}
-                placeholder="Ex: Nossa Senhora de Fátima"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="tempoUniao">Tempo de União (anos)</Label>
-              <Input 
-                id="tempoUniao" 
-                value={formData.tempoUniao} 
-                onChange={(e) => handleChange('tempoUniao', e.target.value)}
-                type="number"
-                placeholder="Ex: 5"
-              />
-            </div>
+        <div className="mt-4">
+          <Stepper steps={steps} currentStep={currentStep} />
+          
+          <div className="mt-6">
+            {renderStepContent()}
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="grid gap-4 p-4 border rounded-lg bg-gray-50 dark:bg-gray-900">
-              <h3 className="text-lg font-medium border-b pb-2 mb-2">Dados da Esposa</h3>
-              
-              <div>
-                <Label htmlFor="esposa.nomeCompleto">Nome Completo*</Label>
-                <Input 
-                  id="esposa.nomeCompleto" 
-                  value={formData.esposa.nomeCompleto} 
-                  onChange={(e) => handleChange('esposa.nomeCompleto', e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="esposa.dataNascimento">Data de Nascimento</Label>
-                <Input 
-                  id="esposa.dataNascimento" 
-                  value={formData.esposa.dataNascimento} 
-                  onChange={(e) => handleChange('esposa.dataNascimento', e.target.value)}
-                  placeholder="DD/MM/AAAA"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="esposa.telefone">Telefone</Label>
-                <Input 
-                  id="esposa.telefone" 
-                  value={formData.esposa.telefone} 
-                  onChange={(e) => handleChange('esposa.telefone', e.target.value)}
-                  placeholder="(99) 99999-9999"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="esposa.email">Email</Label>
-                <Input 
-                  id="esposa.email" 
-                  value={formData.esposa.email} 
-                  onChange={(e) => handleChange('esposa.email', e.target.value)}
-                  type="email"
-                  placeholder="email@exemplo.com"
-                />
-              </div>
-            </div>
+          
+          <div className="mt-8 flex justify-between">
+            <Button
+              type="button"
+              onClick={prevStep}
+              variant="outline"
+              className={`${currentStep === 1 ? 'invisible' : ''}`}
+              disabled={isSubmitting}
+            >
+              Anterior
+            </Button>
             
-            <div className="grid gap-4 p-4 border rounded-lg bg-gray-50 dark:bg-gray-900">
-              <h3 className="text-lg font-medium border-b pb-2 mb-2">Dados do Esposo</h3>
-              
-              <div>
-                <Label htmlFor="esposo.nomeCompleto">Nome Completo*</Label>
-                <Input 
-                  id="esposo.nomeCompleto" 
-                  value={formData.esposo.nomeCompleto} 
-                  onChange={(e) => handleChange('esposo.nomeCompleto', e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="esposo.dataNascimento">Data de Nascimento</Label>
-                <Input 
-                  id="esposo.dataNascimento" 
-                  value={formData.esposo.dataNascimento} 
-                  onChange={(e) => handleChange('esposo.dataNascimento', e.target.value)}
-                  placeholder="DD/MM/AAAA"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="esposo.telefone">Telefone</Label>
-                <Input 
-                  id="esposo.telefone" 
-                  value={formData.esposo.telefone} 
-                  onChange={(e) => handleChange('esposo.telefone', e.target.value)}
-                  placeholder="(99) 99999-9999"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="esposo.email">Email</Label>
-                <Input 
-                  id="esposo.email" 
-                  value={formData.esposo.email} 
-                  onChange={(e) => handleChange('esposo.email', e.target.value)}
-                  type="email"
-                  placeholder="email@exemplo.com"
-                />
-              </div>
-            </div>
+            {currentStep < 4 ? (
+              <Button
+                type="button"
+                onClick={nextStep}
+                disabled={isSubmitting}
+              >
+                Próximo
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isSubmitting || !termsAccepted}
+                className="flex items-center gap-2"
+              >
+                {isSubmitting ? 'Enviando...' : 'Enviar Inscrição'}
+                {!isSubmitting && <Check className="h-4 w-4" />}
+              </Button>
+            )}
           </div>
         </div>
-        
-        <DialogFooter className="mt-6">
-          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
-            Cancelar
-          </Button>
-          <Button 
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Cadastrando...' : 'Cadastrar Casal'}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
