@@ -16,17 +16,17 @@ interface CouplesListProps {
 
 export default function CouplesList({ searchTerm }: CouplesListProps) {
   const { toast } = useToast();
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedCouple, setSelectedCouple] = useState<Couple | null>(null);
 
   const fetchCouples = async () => {
     try {
-      if (!isAdmin) {
+      if (!user) {
         toast({
           title: "Acesso negado",
-          description: "Você não tem permissão para acessar estes dados.",
+          description: "Você precisa estar logado para acessar estes dados.",
           variant: "destructive",
         });
         return [];
@@ -149,14 +149,13 @@ export default function CouplesList({ searchTerm }: CouplesListProps) {
     );
   });
 
-  if (!isAdmin) {
+  if (!user) {
     return (
       <Alert className="mt-6" variant="destructive">
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Acesso negado</AlertTitle>
         <AlertDescription>
-          Você não possui permissão para acessar o gerenciamento de inscrições.
-          Entre em contato com um administrador para obter acesso.
+          Você precisa estar logado para acessar o gerenciamento de inscrições.
         </AlertDescription>
       </Alert>
     );

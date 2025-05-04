@@ -26,20 +26,9 @@ const Index: React.FC = () => {
                 Carregando...
               </Button>
             ) : user ? (
-              isAdmin ? (
-                <Link to="/dashboard">
-                  <Button size="lg">Acessar Dashboard</Button>
-                </Link>
-              ) : (
-                <Alert className="max-w-md mx-auto">
-                  <ShieldAlert className="h-4 w-4" />
-                  <AlertTitle>Acesso limitado</AlertTitle>
-                  <AlertDescription>
-                    Você está logado, mas não possui permissões de administrador.
-                    Entre em contato com um administrador para solicitar acesso.
-                  </AlertDescription>
-                </Alert>
-              )
+              <Link to="/dashboard">
+                <Button size="lg">Acessar Dashboard</Button>
+              </Link>
             ) : (
               <Link to="/auth">
                 <Button size="lg">Área Restrita</Button>

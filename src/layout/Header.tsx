@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ListCheck } from 'lucide-react';
 
 const Header: React.FC = () => {
-  const { user, isAdmin } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   
   return (
@@ -19,7 +19,7 @@ const Header: React.FC = () => {
           <Link to="/" className="text-gray-800 dark:text-gray-200 hover:text-primary">
             Início
           </Link>
-          {user && isAdmin && (
+          {user && (
             <Link 
               to="/dashboard" 
               className="flex items-center gap-2 text-gray-800 dark:text-gray-200 hover:text-primary"
