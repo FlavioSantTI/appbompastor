@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -223,7 +222,7 @@ export default function CoupleFormDialog({ open, onClose }: CoupleFormDialogProp
       
       const inscricaoId = inscricaoData[0].id_inscricao;
       
-      // 2. Inserir endereço
+      // 2. Inserir endereço - MODIFICADO: mudando 'cep' para 'zipCode'
       const { error: enderecoError } = await supabase
         .from('enderecos')
         .insert({
