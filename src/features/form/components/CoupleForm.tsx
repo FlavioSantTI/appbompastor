@@ -58,7 +58,7 @@ const CoupleForm: React.FC<CoupleFormProps> = ({ data, onChange }) => {
 
   return (
     <div className="animate-fade-in">
-      <h2 className="text-xl font-semibold mb-4 text-slate-800 dark:text-slate-200">Dados do Casal</h2>
+      <h2 className="text-xl font-semibold mb-4 text-blue-800 dark:text-blue-300">Dados do Casal</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormInput
@@ -112,20 +112,20 @@ const CoupleForm: React.FC<CoupleFormProps> = ({ data, onChange }) => {
       
       <div className="mt-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium">Filhos</h3>
+          <h3 className="text-lg font-medium text-blue-800 dark:text-blue-300">Filhos</h3>
           <button
             type="button"
             onClick={addChild}
-            className="text-sm flutter-button"
+            className="px-4 py-2 text-sm bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-md transition-colors"
           >
             Adicionar Filho
           </button>
         </div>
         
         {data.children.map((child, index) => (
-          <div key={index} className="flutter-card p-4 mb-4">
+          <div key={index} className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg p-4 mb-4 shadow-sm">
             <div className="flex justify-between items-center mb-2">
-              <h4 className="font-medium">Filho {index + 1}</h4>
+              <h4 className="font-medium text-blue-700 dark:text-blue-300">Filho {index + 1}</h4>
               <button
                 type="button"
                 onClick={() => removeChild(index)}
@@ -155,7 +155,7 @@ const CoupleForm: React.FC<CoupleFormProps> = ({ data, onChange }) => {
                 id={`child-daycare-${index}`}
                 checked={child.needsDaycare}
                 onChange={(e) => updateChild(index, 'needsDaycare', e.target.checked)}
-                className="w-4 h-4 text-flutter-primary focus:ring-flutter-primary rounded cursor-pointer"
+                className="w-4 h-4 text-blue-600 focus:ring-blue-500 rounded cursor-pointer"
               />
               <label
                 htmlFor={`child-daycare-${index}`}
@@ -169,7 +169,7 @@ const CoupleForm: React.FC<CoupleFormProps> = ({ data, onChange }) => {
       </div>
       
       <div className="mt-6">
-        <h3 className="text-lg font-medium mb-4">Contato de Emergência</h3>
+        <h3 className="text-lg font-medium mb-4 text-blue-800 dark:text-blue-300">Contato de Emergência</h3>
         <FormInput
           id="emergencyContact"
           label="Nome do Contato"

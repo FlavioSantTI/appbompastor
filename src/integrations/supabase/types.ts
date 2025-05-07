@@ -84,6 +84,7 @@ export type Database = {
           paroquia_frequentada: string | null
           pontuacao: number | null
           status_visita: string | null
+          telefone_emergencia: string | null
           tempo_uniao: number | null
         }
         Insert: {
@@ -96,6 +97,7 @@ export type Database = {
           paroquia_frequentada?: string | null
           pontuacao?: number | null
           status_visita?: string | null
+          telefone_emergencia?: string | null
           tempo_uniao?: number | null
         }
         Update: {
@@ -108,6 +110,7 @@ export type Database = {
           paroquia_frequentada?: string | null
           pontuacao?: number | null
           status_visita?: string | null
+          telefone_emergencia?: string | null
           tempo_uniao?: number | null
         }
         Relationships: []

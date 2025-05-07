@@ -37,7 +37,7 @@ const WifeForm: React.FC<WifeFormProps> = ({ data, onChange }) => {
 
   return (
     <div className="animate-fade-in">
-      <h2 className="text-xl font-semibold mb-4 text-slate-800 dark:text-slate-200">Dados da Esposa</h2>
+      <h2 className="text-xl font-semibold mb-4 text-blue-800 dark:text-blue-300">Dados da Esposa</h2>
       
       <FormInput
         id="wife-name"
@@ -88,27 +88,33 @@ const WifeForm: React.FC<WifeFormProps> = ({ data, onChange }) => {
         required
       />
       
-      <CheckboxGroup
-        label="Sacramentos"
-        options={SACRAMENTS}
-        selectedOptions={data.sacraments}
-        onChange={(selected) => updateField('sacraments', selected)}
-      />
+      <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg">
+        <CheckboxGroup
+          label="Sacramentos"
+          options={SACRAMENTS}
+          selectedOptions={data.sacraments}
+          onChange={(selected) => updateField('sacraments', selected)}
+        />
+      </div>
       
-      <CheckboxGroup
-        label="Movimentos na Igreja"
-        options={MOVEMENTS}
-        selectedOptions={data.movements}
-        onChange={(selected) => updateField('movements', selected)}
-      />
+      <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg">
+        <CheckboxGroup
+          label="Movimentos na Igreja"
+          options={MOVEMENTS}
+          selectedOptions={data.movements}
+          onChange={(selected) => updateField('movements', selected)}
+        />
+      </div>
       
-      <RadioGroup
-        label="Nova União?"
-        name="wife-new-union"
-        options={unionOptions}
-        selectedValue={data.newUnion}
-        onChange={(value) => updateField('newUnion', value)}
-      />
+      <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg">
+        <RadioGroup
+          label="Nova União?"
+          name="wife-new-union"
+          options={unionOptions}
+          selectedValue={data.newUnion}
+          onChange={(value) => updateField('newUnion', value)}
+        />
+      </div>
     </div>
   );
 };

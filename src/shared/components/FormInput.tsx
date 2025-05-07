@@ -30,6 +30,7 @@ const FormInput = ({
 }: FormInputProps) => {
   const [touched, setTouched] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [focused, setFocused] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = formatFn ? formatFn(e.target.value) : e.target.value;
@@ -58,11 +59,16 @@ const FormInput = ({
   const handleBlur = () => {
     setTouched(true);
     validateInput(value);
+    setFocused(false);
+  };
+
+  const handleFocus = () => {
+    setFocused(true);
   };
 
   return (
     <div className="mb-4">
-      <label htmlFor={id} className="flutter-label">
+      <label htmlFor={id} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       <input
@@ -70,11 +76,16 @@ const FormInput = ({
         type={type}
         value={value}
         onChange={handleChange}
+        onFocus={handleFocus}
         onBlur={handleBlur}
         placeholder={placeholder}
-        className={`flutter-input ${error ? 'border-red-500 focus:ring-red-500' : ''}`}
+        className={`w-full px-4 py-2 rounded-md transition-all duration-200
+          border ${error ? 'border-red-500' : focused ? 'border-blue-400' : 'border-blue-100'} 
+          ${focused ? 'ring-2 ring-blue-200' : ''}
+          bg-blue-50 dark:bg-blue-900/20 
+          focus:outline-none focus:bg-white dark:focus:bg-blue-900/30`}
       />
-      {error && <p className="flutter-error">{error}</p>}
+      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>
   );
 };

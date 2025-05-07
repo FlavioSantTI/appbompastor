@@ -334,9 +334,9 @@ export default function CoupleFormDialog({ open, onClose }: CoupleFormDialogProp
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-950 border border-blue-100 dark:border-blue-900">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Formulário de Inscrição</DialogTitle>
+          <DialogTitle className="text-2xl text-blue-800 dark:text-blue-300">Formulário de Inscrição</DialogTitle>
         </DialogHeader>
         
         <div className="mt-4">
@@ -351,7 +351,7 @@ export default function CoupleFormDialog({ open, onClose }: CoupleFormDialogProp
               type="button"
               onClick={prevStep}
               variant="outline"
-              className={`${currentStep === 1 ? 'invisible' : ''}`}
+              className={`border-blue-200 hover:bg-blue-50 text-blue-700 ${currentStep === 1 ? 'invisible' : ''}`}
               disabled={isSubmitting}
             >
               Anterior
@@ -362,6 +362,7 @@ export default function CoupleFormDialog({ open, onClose }: CoupleFormDialogProp
                 type="button"
                 onClick={nextStep}
                 disabled={isSubmitting}
+                className="bg-blue-600 hover:bg-blue-700"
               >
                 Próximo
               </Button>
@@ -370,7 +371,7 @@ export default function CoupleFormDialog({ open, onClose }: CoupleFormDialogProp
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting || !termsAccepted}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
               >
                 {isSubmitting ? 'Enviando...' : 'Enviar Inscrição'}
                 {!isSubmitting && <Check className="h-4 w-4" />}
