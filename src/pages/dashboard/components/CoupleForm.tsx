@@ -222,7 +222,7 @@ export default function CoupleFormDialog({ open, onClose }: CoupleFormDialogProp
       
       const inscricaoId = inscricaoData[0].id_inscricao;
       
-      // 2. Inserir endereço - MODIFICADO: mudando 'cep' para 'zipCode'
+      // 2. Inserir endereço - Usando o nome de coluna correto 'cep' em vez de 'zipCode'
       const { error: enderecoError } = await supabase
         .from('enderecos')
         .insert({
