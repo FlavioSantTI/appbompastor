@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -230,7 +231,7 @@ export default function CoupleFormDialog({ open, onClose }: CoupleFormDialogProp
           endereco_completo: coupleData.address,
           cidade: coupleData.city,
           estado: coupleData.state,
-          cep: coupleData.zipCode
+          cep: coupleData.zipCode // Usando 'cep' como nome da coluna
         });
       
       if (enderecoError) throw enderecoError;
