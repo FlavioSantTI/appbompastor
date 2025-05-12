@@ -16,11 +16,18 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
   selectedValue, 
   onChange 
 }) => {
+  // Sort options to ensure "Sim" appears first if it exists
+  const sortedOptions = [...options].sort((a, b) => {
+    if (a.label === "Sim") return -1;
+    if (b.label === "Sim") return 1;
+    return 0;
+  });
+
   return (
     <div className="mb-4">
       <p className="flutter-label mb-2">{label}</p>
       <div className="flex flex-wrap gap-4">
-        {options.map((option) => (
+        {sortedOptions.map((option) => (
           <div key={option.value} className="flex items-center">
             <input
               type="radio"

@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       enderecos: {
         Row: {
+          cep: string | null
           cidade: string | null
           endereco_completo: string | null
           estado: string | null
@@ -18,6 +19,7 @@ export type Database = {
           id_inscricao: number | null
         }
         Insert: {
+          cep?: string | null
           cidade?: string | null
           endereco_completo?: string | null
           estado?: string | null
@@ -25,6 +27,7 @@ export type Database = {
           id_inscricao?: number | null
         }
         Update: {
+          cep?: string | null
           cidade?: string | null
           endereco_completo?: string | null
           estado?: string | null

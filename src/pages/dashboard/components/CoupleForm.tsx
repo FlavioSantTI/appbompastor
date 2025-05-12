@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -47,7 +46,7 @@ export default function CoupleFormDialog({ open, onClose }: CoupleFormDialogProp
     email: '',
     sacraments: [],
     movements: [],
-    newUnion: 'no',
+    newUnion: 'yes', // Changed default from 'no' to 'yes'
   });
 
   const [husbandData, setHusbandData] = useState<HusbandData>({
@@ -58,7 +57,7 @@ export default function CoupleFormDialog({ open, onClose }: CoupleFormDialogProp
     email: '',
     sacraments: [],
     movements: [],
-    newUnion: 'no',
+    newUnion: 'yes', // Changed default from 'no' to 'yes'
   });
 
   const [coupleData, setCoupleData] = useState<CoupleData>({
@@ -162,7 +161,7 @@ export default function CoupleFormDialog({ open, onClose }: CoupleFormDialogProp
       email: '',
       sacraments: [],
       movements: [],
-      newUnion: 'no',
+      newUnion: 'yes', // Changed default from 'no' to 'yes'
     });
     setHusbandData({
       name: '',
@@ -172,7 +171,7 @@ export default function CoupleFormDialog({ open, onClose }: CoupleFormDialogProp
       email: '',
       sacraments: [],
       movements: [],
-      newUnion: 'no',
+      newUnion: 'yes', // Changed default from 'no' to 'yes'
     });
     setCoupleData({
       address: '',
@@ -223,7 +222,7 @@ export default function CoupleFormDialog({ open, onClose }: CoupleFormDialogProp
       
       const inscricaoId = inscricaoData[0].id_inscricao;
       
-      // 2. Inserir endereço - Usando o nome de coluna correto 'cep' em vez de 'zipCode'
+      // 2. Inserir endereço - Usando o nome de coluna correto 'cep'
       const { error: enderecoError } = await supabase
         .from('enderecos')
         .insert({
