@@ -1,10 +1,11 @@
 
 import { validateRequired, validateEmail, validatePhone } from '@/core/validation';
+import { PersonData } from '@/features/form/components/PersonForm';
 import { WifeData } from '@/features/form/components/WifeForm';
 import { HusbandData } from '@/features/form/components/HusbandForm';
 import { CoupleData } from '@/features/form/components/CoupleForm';
 
-export const validateWifeData = (data: WifeData): boolean => {
+export const validatePersonData = (data: PersonData): boolean => {
   return (
     validateRequired(data.name) &&
     validateRequired(data.nickname) &&
@@ -14,14 +15,12 @@ export const validateWifeData = (data: WifeData): boolean => {
   );
 };
 
+export const validateWifeData = (data: WifeData): boolean => {
+  return validatePersonData(data);
+};
+
 export const validateHusbandData = (data: HusbandData): boolean => {
-  return (
-    validateRequired(data.name) &&
-    validateRequired(data.nickname) &&
-    validateRequired(data.birthdate) &&
-    validateRequired(data.phone) && validatePhone(data.phone) &&
-    validateRequired(data.email) && validateEmail(data.email)
-  );
+  return validatePersonData(data);
 };
 
 export const validateCoupleData = (data: CoupleData): boolean => {
