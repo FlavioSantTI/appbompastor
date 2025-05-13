@@ -8,7 +8,7 @@ export const submitCoupleForm = async (
   wifeData: WifeData, 
   husbandData: HusbandData, 
   coupleData: CoupleData
-) => {
+): Promise<number> => {
   // 1. Inserir a inscrição do casal
   const { data: inscricaoData, error: inscricaoError } = await supabase
     .from('inscricoes')

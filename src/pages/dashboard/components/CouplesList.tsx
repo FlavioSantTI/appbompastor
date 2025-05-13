@@ -32,39 +32,100 @@ export default function CouplesList({ searchTerm }: CouplesListProps) {
         return [];
       }
 
-      let query = supabase
-        .from('inscricoes')
-        .select(`
-          id_inscricao,
-          codigo_casal,
-          data_hora_inscricao,
-          pessoas!pessoas_id_inscricao_fkey (
-            nome_completo,
-            tipo_conjuge,
-            sexo
-          )
-        `);
+      // Se o usuário não for admin, buscar apenas a inscrição dele
+      if (!isAdmin) {
+        const { data: userProfile, error: profileError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', user.id)
+          .single();
 
-      const { data, error } = await query;
+        if (profileError) throw profileError;
 
-      if (error) throw error;
+        // Buscar pessoas vinculadas ao usuário
+        const { data: pessoasData, error: pessoasError } = await supabase
+          .from('pessoas')
+          .select('id_inscricao, email')
+          .eq('email', user.email);
 
-      // Processar os dados para o formato correto
-      const formattedCouples: Couple[] = data.map((row: any) => {
-        // Separar em esposo e esposa
-        const esposo = row.pessoas?.find((p: any) => p.sexo === 'M') || null;
-        const esposa = row.pessoas?.find((p: any) => p.sexo === 'F') || null;
+        if (pessoasError) throw pessoasError;
 
-        return {
-          id_inscricao: row.id_inscricao,
-          codigo_casal: row.codigo_casal,
-          esposa: esposa ? { nome_completo: esposa.nome_completo } : null,
-          esposo: esposo ? { nome_completo: esposo.nome_completo } : null,
-          data_hora_inscricao: row.data_hora_inscricao
-        };
-      });
+        if (pessoasData.length === 0) {
+          return [];
+        }
 
-      return formattedCouples;
+        // Obter os IDs de inscrição do usuário
+        const inscricaoIds = pessoasData.map(p => p.id_inscricao);
+
+        // Buscar apenas as inscrições associadas ao usuário
+        let query = supabase
+          .from('inscricoes')
+          .select(`
+            id_inscricao,
+            codigo_casal,
+            data_hora_inscricao,
+            pessoas!pessoas_id_inscricao_fkey (
+              nome_completo,
+              tipo_conjuge,
+              sexo
+            )
+          `)
+          .in('id_inscricao', inscricaoIds);
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        // Processar os dados para o formato correto
+        const formattedCouples: Couple[] = data.map((row: any) => {
+          // Separar em esposo e esposa
+          const esposo = row.pessoas?.find((p: any) => p.sexo === 'M') || null;
+          const esposa = row.pessoas?.find((p: any) => p.sexo === 'F') || null;
+
+          return {
+            id_inscricao: row.id_inscricao,
+            codigo_casal: row.codigo_casal,
+            esposa: esposa ? { nome_completo: esposa.nome_completo } : null,
+            esposo: esposo ? { nome_completo: esposo.nome_completo } : null,
+            data_hora_inscricao: row.data_hora_inscricao
+          };
+        });
+
+        return formattedCouples;
+      } else {
+        // Comportamento atual para administradores
+        let query = supabase
+          .from('inscricoes')
+          .select(`
+            id_inscricao,
+            codigo_casal,
+            data_hora_inscricao,
+            pessoas!pessoas_id_inscricao_fkey (
+              nome_completo,
+              tipo_conjuge,
+              sexo
+            )
+          `);
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        // Processar os dados para o formato correto
+        const formattedCouples: Couple[] = data.map((row: any) => {
+          // Separar em esposo e esposa
+          const esposo = row.pessoas?.find((p: any) => p.sexo === 'M') || null;
+          const esposa = row.pessoas?.find((p: any) => p.sexo === 'F') || null;
+
+          return {
+            id_inscricao: row.id_inscricao,
+            codigo_casal: row.codigo_casal,
+            esposa: esposa ? { nome_completo: esposa.nome_completo } : null,
+            esposo: esposo ? { nome_completo: esposo.nome_completo } : null,
+            data_hora_inscricao: row.data_hora_inscricao
+          };
+        });
+
+        return formattedCouples;
+      }
     } catch (error: any) {
       toast({
         title: "Erro ao carregar casais",
