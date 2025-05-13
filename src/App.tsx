@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/dashboard";
 import AuthPage from "./pages/auth";
 import NotFound from "./pages/NotFound";
+import EventosAdmin from "./pages/admin/eventos";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,13 @@ const App = () => (
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/eventos" element={
+              <ProtectedRoute>
+                <AdminRoute>
+                  <EventosAdmin />
+                </AdminRoute>
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />

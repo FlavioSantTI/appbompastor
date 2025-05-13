@@ -9,6 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      casal_evento: {
+        Row: {
+          data_inscricao: string
+          id: string
+          id_evento: string
+          id_inscricao: number
+          observacoes: string | null
+          presente: boolean | null
+        }
+        Insert: {
+          data_inscricao?: string
+          id?: string
+          id_evento: string
+          id_inscricao: number
+          observacoes?: string | null
+          presente?: boolean | null
+        }
+        Update: {
+          data_inscricao?: string
+          id?: string
+          id_evento?: string
+          id_inscricao?: number
+          observacoes?: string | null
+          presente?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "casal_evento_id_evento_fkey"
+            columns: ["id_evento"]
+            isOneToOne: false
+            referencedRelation: "eventos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "casal_evento_id_inscricao_fkey"
+            columns: ["id_inscricao"]
+            isOneToOne: false
+            referencedRelation: "inscricoes"
+            referencedColumns: ["id_inscricao"]
+          },
+        ]
+      }
       enderecos: {
         Row: {
           cep: string | null
@@ -43,6 +85,45 @@ export type Database = {
             referencedColumns: ["id_inscricao"]
           },
         ]
+      }
+      eventos: {
+        Row: {
+          cidade: string
+          criado_em: string | null
+          data_fim: string
+          data_inicio: string
+          estado: string
+          hora_fim: string
+          hora_inicio: string
+          id: string
+          local: string
+          titulo: string
+        }
+        Insert: {
+          cidade: string
+          criado_em?: string | null
+          data_fim: string
+          data_inicio: string
+          estado: string
+          hora_fim: string
+          hora_inicio: string
+          id?: string
+          local: string
+          titulo: string
+        }
+        Update: {
+          cidade?: string
+          criado_em?: string | null
+          data_fim?: string
+          data_inicio?: string
+          estado?: string
+          hora_fim?: string
+          hora_inicio?: string
+          id?: string
+          local?: string
+          titulo?: string
+        }
+        Relationships: []
       }
       filhos: {
         Row: {

@@ -1,9 +1,8 @@
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Check } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 
-interface FormNavigationProps {
+export interface FormNavigationProps {
   currentStep: number;
   totalSteps: number;
   onPrevious: () => void;
@@ -11,47 +10,59 @@ interface FormNavigationProps {
   onSubmit: () => void;
   isSubmitting: boolean;
   canSubmit: boolean;
+  submitLabel?: string; // Adicionando suporte para label personalizado
 }
 
-const FormNavigation: React.FC<FormNavigationProps> = ({
+const FormNavigation = ({
   currentStep,
   totalSteps,
   onPrevious,
   onNext,
   onSubmit,
   isSubmitting,
-  canSubmit
-}) => {
+  canSubmit,
+  submitLabel = "Finalizar Inscrição" // Valor padrão para manter compatibilidade
+}: FormNavigationProps) => {
+  const isFirstStep = currentStep === 1;
+  const isLastStep = currentStep === totalSteps;
+
   return (
-    <div className="mt-8 flex justify-between">
+    <div className="flex justify-between mt-8">
       <Button
         type="button"
-        onClick={onPrevious}
         variant="outline"
-        className={`border-blue-200 hover:bg-blue-50 text-blue-700 ${currentStep === 1 ? 'invisible' : ''}`}
+        className={`${isFirstStep ? 'invisible' : ''}`}
+        onClick={onPrevious}
         disabled={isSubmitting}
       >
+        <ChevronLeft className="mr-2 h-4 w-4" />
         Anterior
       </Button>
-      
-      {currentStep < totalSteps ? (
-        <Button
-          type="button"
-          onClick={onNext}
-          disabled={isSubmitting}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          Próximo
-        </Button>
-      ) : (
+
+      {isLastStep ? (
         <Button
           type="button"
           onClick={onSubmit}
           disabled={isSubmitting || !canSubmit}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+          className="ml-auto"
         >
-          {isSubmitting ? 'Enviando...' : 'Enviar Inscrição'}
-          {!isSubmitting && <Check className="h-4 w-4" />}
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Processando...
+            </>
+          ) : (
+            submitLabel
+          )}
+        </Button>
+      ) : (
+        <Button
+          type="button"
+          onClick={onNext}
+          className="ml-auto"
+        >
+          Próximo
+          <ChevronRight className="ml-2 h-4 w-4" />
         </Button>
       )}
     </div>
