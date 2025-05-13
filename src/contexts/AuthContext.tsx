@@ -54,17 +54,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Configurar listener para mudanças de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+      (event, currentSession) => {
+        // Atualizar estado local com os dados da sessão
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
 
         // Se tiver um usuário autenticado, buscar o perfil
-        if (session?.user) {
-          fetchProfile(session.user.id);
+        if (currentSession?.user) {
+          setTimeout(() => {
+            fetchProfile(currentSession.user.id);
+          }, 0);
         } else {
           setProfile(null);
         }
 
+        // Mostrar mensagens de toast para eventos de login/logout
         if (event === 'SIGNED_IN') {
           toast({
             title: "Login bem-sucedido",
@@ -80,13 +84,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     // Verificar sessão inicial
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      setSession(initialSession);
+      setUser(initialSession?.user ?? null);
       
       // Se tiver um usuário autenticado, buscar o perfil
-      if (session?.user) {
-        fetchProfile(session.user.id);
+      if (initialSession?.user) {
+        fetchProfile(initialSession.user.id);
       }
       
       setLoading(false);
@@ -106,7 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await supabase.auth.signOut({ scope: 'local' });
   };
 
   const value = {

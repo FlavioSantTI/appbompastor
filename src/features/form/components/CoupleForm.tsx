@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import FormInput from '@/shared/components/FormInput';
-import { validateRequired } from '@/core/validation';
+import { formatPhone, validatePhone, validateRequired } from '@/core/validation';
+import { VALIDATION_MESSAGES } from '@/core/constants';
 
 export interface ChildData {
   name: string;
@@ -183,6 +184,9 @@ const CoupleForm: React.FC<CoupleFormProps> = ({ data, onChange }) => {
           label="Telefone"
           value={data.emergencyPhone}
           onChange={(value) => updateField('emergencyPhone', value)}
+          formatFn={formatPhone}
+          validator={validatePhone}
+          errorMessage={VALIDATION_MESSAGES.INVALID_PHONE}
           required
         />
       </div>

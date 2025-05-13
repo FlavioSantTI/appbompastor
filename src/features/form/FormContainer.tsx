@@ -8,6 +8,7 @@ import ReviewForm from './components/ReviewForm';
 import { FORM_SECTIONS } from '@/core/constants';
 import { validateRequired, validateEmail, validatePhone } from '@/core/validation';
 import { useToast } from '@/hooks/use-toast';
+import { Card } from '@/components/ui/card';
 
 const steps = [
   { id: 1, name: FORM_SECTIONS.WIFE },
@@ -217,10 +218,12 @@ const FormContainer: React.FC = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white dark:bg-card shadow-lg rounded-2xl p-6">
+    <Card className="max-w-3xl mx-auto p-6 shadow-md border border-gray-100 dark:border-gray-800">
+      <h1 className="text-2xl font-bold text-blue-800 dark:text-blue-300 mb-6">Formulário de Inscrição</h1>
+      
       <Stepper steps={steps} currentStep={currentStep} />
       
-      <div className="mt-6">
+      <div className="mt-8 p-4 bg-white dark:bg-slate-900 rounded-lg">
         {renderStepContent()}
       </div>
       
@@ -254,7 +257,7 @@ const FormContainer: React.FC = () => {
           </button>
         )}
       </div>
-    </div>
+    </Card>
   );
 };
 

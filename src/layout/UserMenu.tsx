@@ -20,8 +20,12 @@ export default function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate('/auth');
+    try {
+      await signOut();
+      navigate('/auth');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
   };
 
   if (!user) {
