@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import UserMenu from './UserMenu';
 import { useAuth } from '@/contexts/AuthContext';
-import { Menu, X, Calendar, Home, Users, ListCheck } from 'lucide-react';
+import { Menu, X, Calendar, Home, Users, LayoutDashboard, ListCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -45,13 +45,22 @@ const Header: React.FC = () => {
             )}
             
             {isAdmin && (
-              <Link 
-                to="/admin/eventos" 
-                className="text-gray-700 dark:text-gray-300 hover:text-primary flex items-center gap-1"
-              >
-                <Calendar className="h-4 w-4" />
-                <span>Eventos</span>
-              </Link>
+              <>
+                <Link 
+                  to="/admin/dashboard" 
+                  className="text-gray-700 dark:text-gray-300 hover:text-primary flex items-center gap-1"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  <span>Painel Admin</span>
+                </Link>
+                <Link 
+                  to="/admin/eventos" 
+                  className="text-gray-700 dark:text-gray-300 hover:text-primary flex items-center gap-1"
+                >
+                  <Calendar className="h-4 w-4" />
+                  <span>Eventos</span>
+                </Link>
+              </>
             )}
           </nav>
           
@@ -99,16 +108,28 @@ const Header: React.FC = () => {
           )}
           
           {isAdmin && (
-            <Link 
-              to="/admin/eventos" 
-              className="block p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <span className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                Eventos
-              </span>
-            </Link>
+            <>
+              <Link 
+                to="/admin/dashboard" 
+                className="block p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className="flex items-center gap-2">
+                  <LayoutDashboard className="h-4 w-4" />
+                  Painel Admin
+                </span>
+              </Link>
+              <Link 
+                to="/admin/eventos" 
+                className="block p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Eventos
+                </span>
+              </Link>
+            </>
           )}
           
           {!user && (

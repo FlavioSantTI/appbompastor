@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom';
 import MainLayout from '@/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { Loader2, ShieldAlert, Calendar, Users, ClipboardCheck } from 'lucide-react';
+import { Loader2, ShieldAlert, Calendar, Users, ClipboardCheck, LayoutDashboard } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const Index: React.FC = () => {
   const { user, loading, isAdmin } = useAuth();
@@ -14,7 +15,7 @@ const Index: React.FC = () => {
     <MainLayout>
       <div className="container mx-auto py-8 px-4">
         <section className="flex flex-col lg:flex-row gap-6 lg:gap-12 items-center mb-16">
-          <div className="w-full lg:w-1/2 space-y-6">
+          <div className="w-full space-y-6">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
               Encontro de Casais em Nova União com Bom Pastor
             </h1>
@@ -29,23 +30,22 @@ const Index: React.FC = () => {
                   Carregando...
                 </Button>
               ) : user ? (
-                <Link to="/dashboard">
-                  <Button size="lg" className="mr-4">Acessar Dashboard</Button>
-                </Link>
+                <div className="flex flex-wrap gap-3">
+                  <Link to="/dashboard">
+                    <Button size="lg" className="mr-4">Acessar Inscrições</Button>
+                  </Link>
+                  {isAdmin && (
+                    <Link to="/admin/dashboard">
+                      <Button size="lg" variant="outline">Painel Administrativo</Button>
+                    </Link>
+                  )}
+                </div>
               ) : (
                 <Link to="/auth">
                   <Button size="lg">Área Restrita</Button>
                 </Link>
               )}
             </div>
-          </div>
-          
-          <div className="w-full lg:w-1/2">
-            <img 
-              src="https://images.unsplash.com/photo-1529634806980-85c3dd6d34ac?q=80&w=1769&auto=format&fit=crop" 
-              alt="Encontro de Casais" 
-              className="rounded-lg shadow-lg w-full h-auto object-cover"
-            />
           </div>
         </section>
 
@@ -92,23 +92,27 @@ const Index: React.FC = () => {
 
         {isAdmin && (
           <section className="mb-12">
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-6 rounded-lg shadow-sm">
-              <h2 className="text-2xl font-bold mb-4 flex items-center">
-                <ShieldAlert className="mr-2 h-5 w-5 text-blue-600 dark:text-blue-400" />
-                Área Administrativa
-              </h2>
-              <p className="mb-6 text-gray-700 dark:text-gray-300">
-                Como administrador, você tem acesso a recursos adicionais para gerenciar o encontro.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Link to="/dashboard">
-                  <Button variant="outline">Gerenciar Inscrições</Button>
-                </Link>
-                <Link to="/admin/eventos">
-                  <Button variant="outline">Gerenciar Eventos</Button>
-                </Link>
-              </div>
-            </div>
+            <Card className="border border-blue-200 dark:border-blue-800">
+              <CardHeader className="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800">
+                <div className="flex items-center">
+                  <ShieldAlert className="mr-2 h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <CardTitle>Área Administrativa</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                <p className="mb-6 text-gray-700 dark:text-gray-300">
+                  Como administrador, você tem acesso a recursos adicionais para gerenciar o encontro.
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <Link to="/admin/dashboard">
+                    <Button className="flex items-center gap-2">
+                      <LayoutDashboard className="h-4 w-4" />
+                      Acessar Painel Administrativo
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
           </section>
         )}
 

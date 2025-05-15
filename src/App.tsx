@@ -12,6 +12,7 @@ import Dashboard from "./pages/dashboard";
 import AuthPage from "./pages/auth";
 import NotFound from "./pages/NotFound";
 import EventosAdmin from "./pages/admin/eventos";
+import AdminDashboard from "./pages/admin/dashboard";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,13 @@ const App = () => (
               <ProtectedRoute>
                 <AdminRoute>
                   <EventosAdmin />
+                </AdminRoute>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/dashboard" element={
+              <ProtectedRoute>
+                <AdminRoute>
+                  <AdminDashboard />
                 </AdminRoute>
               </ProtectedRoute>
             } />
