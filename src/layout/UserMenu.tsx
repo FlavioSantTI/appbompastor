@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, User, Shield } from 'lucide-react';
+import { LogOut, User, Shield, Bot } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
@@ -40,7 +40,11 @@ export default function UserMenu() {
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <User className="h-5 w-5" />
+          {isAdmin ? (
+            <User className="h-5 w-5" />
+          ) : (
+            <Bot className="h-5 w-5" />
+          )}
           {isAdmin && (
             <span className="absolute -right-1 -top-1">
               <Shield className="h-4 w-4 text-primary" />
