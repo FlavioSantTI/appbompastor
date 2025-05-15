@@ -55,6 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Configurar listener para mudanças de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
+        console.log("Auth state changed:", event, currentSession);
         // Atualizar estado local com os dados da sessão
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
@@ -85,6 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Verificar sessão inicial
     supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      console.log("Initial session:", initialSession);
       setSession(initialSession);
       setUser(initialSession?.user ?? null);
       
@@ -100,17 +102,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [toast]);
 
   const signIn = async (email: string, password: string) => {
+    console.log("Attempting to sign in with:", email);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      console.error("Sign in error:", error);
+    }
     return { error };
   };
 
   const signUp = async (email: string, password: string) => {
+    console.log("Attempting to sign up with:", email);
     const { error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      console.error("Sign up error:", error);
+    }
     return { error };
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut({ scope: 'local' });
+    console.log("Attempting to sign out");
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Sign out error:", error);
+        throw error;
+      }
+    } catch (error) {
+      console.error("Error during sign out:", error);
+      throw error;
+    }
   };
 
   const value = {

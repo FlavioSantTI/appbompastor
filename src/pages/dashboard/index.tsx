@@ -38,16 +38,16 @@ export default function DashboardPage() {
           </p>
         </div>
         
-        {isAdmin && (
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-            <Button 
-              onClick={handleOpenForm} 
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Adicionar Casal
-            </Button>
-            
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <Button 
+            onClick={handleOpenForm} 
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            {isAdmin ? "Adicionar Casal" : "Incluir Inscrição"}
+          </Button>
+          
+          {isAdmin && (
             <div className="relative w-full md:w-64">
               <Input
                 type="text"
@@ -58,8 +58,8 @@ export default function DashboardPage() {
               />
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             </div>
-          </div>
-        )}
+          )}
+        </div>
         
         <CouplesList searchTerm={searchTerm} />
         

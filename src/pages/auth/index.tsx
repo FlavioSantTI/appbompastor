@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
-import MainLayout from '@/layout/MainLayout';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const AuthPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -65,90 +65,92 @@ const AuthPage: React.FC = () => {
   };
 
   return (
-    <MainLayout>
-      <div className="flex justify-center items-center min-h-[calc(100vh-200px)]">
-        <Card className="w-[350px]">
-          <CardHeader>
-            <CardTitle>Área Restrita</CardTitle>
-            <CardDescription>Acesse o sistema de gestão de casais.</CardDescription>
-          </CardHeader>
-          <Tabs defaultValue="login">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="cadastro">Cadastro</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="login">
-              <form onSubmit={handleSignIn}>
-                <CardContent className="space-y-4 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input 
-                      id="email" 
-                      type="email" 
-                      placeholder="seu@email.com" 
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
+    <div className="flex justify-center items-center min-h-screen bg-background">
+      <Card className="w-[400px] shadow-lg">
+        <CardHeader className="text-center pb-2">
+          <CardTitle className="text-2xl">LOGIN</CardTitle>
+        </CardHeader>
+        <Tabs defaultValue="login">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="login">Login</TabsTrigger>
+            <TabsTrigger value="cadastro">Cadastro</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="login">
+            <form onSubmit={handleSignIn}>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="Email / Nome de usuário" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="bg-muted/50"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Input 
+                    id="password" 
+                    type="password"
+                    placeholder="Senha"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="bg-muted/50"
+                  />
+                </div>
+                <div className="flex items-center justify-between mt-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="remember" />
+                    <Label htmlFor="remember" className="text-sm font-normal">Lembrar-me</Label>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Senha</Label>
-                    <Input 
-                      id="password" 
-                      type="password" 
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  {error && <p className="text-red-500 text-sm">{error}</p>}
-                </CardContent>
-                <CardFooter>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Processando...' : 'Entrar'}
-                  </Button>
-                </CardFooter>
-              </form>
-            </TabsContent>
-            
-            <TabsContent value="cadastro">
-              <form onSubmit={handleSignUp}>
-                <CardContent className="space-y-4 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <Input 
-                      id="signup-email" 
-                      type="email" 
-                      placeholder="seu@email.com" 
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Senha</Label>
-                    <Input 
-                      id="signup-password" 
-                      type="password" 
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  {error && <p className="text-red-500 text-sm">{error}</p>}
-                </CardContent>
-                <CardFooter>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Processando...' : 'Cadastrar'}
-                  </Button>
-                </CardFooter>
-              </form>
-            </TabsContent>
-          </Tabs>
-        </Card>
-      </div>
-    </MainLayout>
+                  <Button variant="link" className="p-0 h-auto text-sm">Esqueceu?</Button>
+                </div>
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+                <Button type="submit" className="w-full bg-indigo-500 hover:bg-indigo-600" disabled={loading}>
+                  {loading ? 'Processando...' : 'LOGIN'}
+                </Button>
+              </CardContent>
+            </form>
+          </TabsContent>
+          
+          <TabsContent value="cadastro">
+            <form onSubmit={handleSignUp}>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Input 
+                    id="signup-email" 
+                    type="email" 
+                    placeholder="Email" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="bg-muted/50"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Input 
+                    id="signup-password" 
+                    type="password"
+                    placeholder="Senha"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="bg-muted/50"
+                  />
+                </div>
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+                <Button type="submit" className="w-full bg-indigo-500 hover:bg-indigo-600" disabled={loading}>
+                  {loading ? 'Processando...' : 'CADASTRAR'}
+                </Button>
+              </CardContent>
+            </form>
+          </TabsContent>
+        </Tabs>
+      </Card>
+    </div>
   );
 };
 

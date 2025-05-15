@@ -22,6 +22,7 @@ export default function UserMenu() {
   const handleSignOut = async () => {
     try {
       await signOut();
+      setIsOpen(false);
       navigate('/auth');
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
