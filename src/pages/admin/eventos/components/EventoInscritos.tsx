@@ -201,7 +201,7 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
     }
   };
 
-  const handleTogglePresenca = async (id: string, status_inscricao: string | null) => {
+  const handleTogglePresenca = async (id: string, status_inscricao: string | null | undefined) => {
     // Alternar entre "presente" e "ausente"
     const novoStatus = status_inscricao === "presente" ? "ausente" : "presente";
     try {
@@ -358,7 +358,10 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
                         variant="ghost"
                         size="icon"
                         onClick={() =>
-                          handleTogglePresenca(inscrito.id, inscrito.status_inscricao)
+                          handleTogglePresenca(
+                            inscrito.id,
+                            inscrito.status_inscricao
+                          )
                         }
                         className={
                           inscrito.status_inscricao === "presente"

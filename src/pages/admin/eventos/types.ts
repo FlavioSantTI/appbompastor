@@ -28,7 +28,7 @@ export interface CasalEvento {
   id_inscricao: number;
   id_evento: string;
   data_inscricao: string;
-  presente: boolean;
+  status_inscricao?: string | null; // <- Adicionado para refletir o campo do banco
   observacoes?: string;
   casal?: {
     codigo_casal: number;

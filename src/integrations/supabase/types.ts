@@ -49,6 +49,20 @@ export type Database = {
             referencedRelation: "inscricoes"
             referencedColumns: ["id_inscricao"]
           },
+          {
+            foreignKeyName: "fk_casal_evento_evento"
+            columns: ["id_evento"]
+            isOneToOne: false
+            referencedRelation: "eventos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_casal_evento_inscricao"
+            columns: ["id_inscricao"]
+            isOneToOne: false
+            referencedRelation: "inscricoes"
+            referencedColumns: ["id_inscricao"]
+          },
         ]
       }
       enderecos: {
