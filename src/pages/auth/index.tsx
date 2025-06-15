@@ -1,17 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Loader2, User } from 'lucide-react';
 
 const AuthPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [tab, setTab] = useState<'login' | 'signup'>('login');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { signIn, signUp, user } = useAuth();
@@ -23,133 +22,180 @@ const AuthPage: React.FC = () => {
     }
   }, [user, navigate]);
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!email || !password) {
-      setError('Por favor, preencha todos os campos.');
+      setError('Preencha todos os campos.');
       return;
     }
-
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
       const { error } = await signIn(email, password);
       if (error) throw error;
-    } catch (error: any) {
-      setError(error.message || 'Falha ao realizar login. Verifique suas credenciais.');
+    } catch (err: any) {
+      setError(err.message || 'Falha ao realizar login.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!email || !password) {
-      setError('Por favor, preencha todos os campos.');
+      setError('Preencha todos os campos.');
       return;
     }
-
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
       const { error } = await signUp(email, password);
       if (error) throw error;
-      setError('Cadastro bem-sucedido. Verifique seu e-mail para confirmar o cadastro.');
-    } catch (error: any) {
-      setError(error.message || 'Falha ao realizar cadastro.');
+      setError('Cadastro bem-sucedido. Verifique seu e-mail!');
+    } catch (err: any) {
+      setError(err.message || 'Falha ao realizar cadastro.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-background">
-      <Card className="w-[400px] shadow-lg">
-        <CardHeader className="text-center pb-2">
-          <CardTitle className="text-2xl">LOGIN</CardTitle>
-        </CardHeader>
-        <Tabs defaultValue="login">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="cadastro">Cadastro</TabsTrigger>
-          </TabsList>
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-100 via-blue-200 to-indigo-100 dark:from-background dark:to-background">
+      <div className="w-full max-w-sm mx-auto flex flex-col items-center justify-center px-4 py-10 relative animate-fade-in">
+        <div className="bg-white dark:bg-card rounded-2xl shadow-lg w-full p-8 pt-6 border border-blue-100 dark:border-blue-900/50 flex flex-col items-center">
           
-          <TabsContent value="login">
-            <form onSubmit={handleSignIn}>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    placeholder="Email / Nome de usuário" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="bg-muted/50"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Input 
-                    id="password" 
-                    type="password"
-                    placeholder="Senha"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="bg-muted/50"
-                  />
-                </div>
-                <div className="flex items-center justify-between mt-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="remember" />
-                    <Label htmlFor="remember" className="text-sm font-normal">Lembrar-me</Label>
-                  </div>
-                  <Button variant="link" className="p-0 h-auto text-sm">Esqueceu?</Button>
-                </div>
-                {error && <p className="text-red-500 text-sm">{error}</p>}
-                <Button type="submit" className="w-full bg-indigo-500 hover:bg-indigo-600" disabled={loading}>
-                  {loading ? 'Processando...' : 'LOGIN'}
-                </Button>
-              </CardContent>
-            </form>
-          </TabsContent>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="inline-flex p-2 bg-blue-100 rounded-full text-blue-600 shadow-sm">
+              <User className="w-6 h-6" />
+            </span>
+            <h1 className="text-2xl md:text-3xl font-bold text-blue-800 dark:text-white ml-1 tracking-tight">{tab === 'signup' ? 'Cadastro' : 'Entrar'}</h1>
+          </div>
+          <p className="text-base text-muted-foreground mb-6">
+            {tab === 'signup' ? "Crie sua conta e participe" : "Bem-vindo de volta!"}
+          </p>
+
+          <div className="flex w-full mb-7">
+            <button
+              type="button"
+              className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-colors ${tab === 'login'
+                ? 'bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-white'
+                : 'bg-transparent text-muted-foreground hover:bg-muted/50'
+                }`}
+              onClick={() => setTab('login')}
+            >
+              Login
+            </button>
+            <button
+              type="button"
+              className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-colors ${tab === 'signup'
+                ? 'bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-white'
+                : 'bg-transparent text-muted-foreground hover:bg-muted/50'
+                }`}
+              onClick={() => setTab('signup')}
+            >
+              Cadastro
+            </button>
+          </div>
           
-          <TabsContent value="cadastro">
-            <form onSubmit={handleSignUp}>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Input 
-                    id="signup-email" 
-                    type="email" 
-                    placeholder="Email" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="bg-muted/50"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Input 
-                    id="signup-password" 
-                    type="password"
-                    placeholder="Senha"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="bg-muted/50"
-                  />
-                </div>
-                {error && <p className="text-red-500 text-sm">{error}</p>}
-                <Button type="submit" className="w-full bg-indigo-500 hover:bg-indigo-600" disabled={loading}>
-                  {loading ? 'Processando...' : 'CADASTRAR'}
-                </Button>
-              </CardContent>
+          {tab === 'login' && (
+            <form onSubmit={handleLogin} className="w-full space-y-4">
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="username"
+                  placeholder="Digite seu email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  disabled={loading}
+                  className="mt-1"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="password">Senha</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="Digite sua senha"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  disabled={loading}
+                  className="mt-1"
+                  required
+                />
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  className="text-xs text-blue-500 hover:underline focus:outline-none"
+                  disabled={loading}
+                >
+                  Esqueceu a senha?
+                </button>
+              </div>
+              {error && <p className="text-red-500 text-sm font-medium text-center">{error}</p>}
+              <Button
+                type="submit"
+                className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold h-11 rounded-xl mt-2"
+                disabled={loading}
+              >
+                {loading && <Loader2 className="animate-spin mr-2 w-5 h-5" />}
+                {loading ? "Entrando..." : "Entrar"}
+              </Button>
             </form>
-          </TabsContent>
-        </Tabs>
-      </Card>
+          )}
+
+          {tab === 'signup' && (
+            <form onSubmit={handleSignup} className="w-full space-y-4">
+              <div>
+                <Label htmlFor="signup-email">Email</Label>
+                <Input
+                  id="signup-email"
+                  type="email"
+                  autoComplete="username"
+                  placeholder="Digite seu email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  disabled={loading}
+                  className="mt-1"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="signup-password">Senha</Label>
+                <Input
+                  id="signup-password"
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="Crie uma senha"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  disabled={loading}
+                  className="mt-1"
+                  required
+                />
+              </div>
+              {error && <p className="text-red-500 text-sm font-medium text-center">{error}</p>}
+              <Button
+                type="submit"
+                className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold h-11 rounded-xl mt-2"
+                disabled={loading}
+              >
+                {loading && <Loader2 className="animate-spin mr-2 w-5 h-5" />}
+                {loading ? "Cadastrando..." : "Cadastrar"}
+              </Button>
+            </form>
+          )}
+
+        </div>
+        <p className="mt-10 text-xs text-muted-foreground text-center max-w-xs select-none">
+          © {new Date().getFullYear()} - Seu evento brilhando em cada detalhe
+        </p>
+      </div>
     </div>
   );
 };
