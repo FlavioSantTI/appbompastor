@@ -201,11 +201,13 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
     }
   };
 
-  const handleTogglePresenca = async (id: string, presente: boolean) => {
+  const handleTogglePresenca = async (id: string, status_inscricao: string | null) => {
+    // Alternar entre "presente" e "ausente"
+    const novoStatus = status_inscricao === "presente" ? "ausente" : "presente";
     try {
       const { error } = await supabase
         .from("casal_evento")
-        .update({ presente: !presente })
+        .update({ status_inscricao: novoStatus })
         .eq("id", id);
 
       if (error) throw error;
@@ -214,7 +216,7 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
       setInscritos(
         inscritos.map((inscrito) =>
           inscrito.id === id
-            ? { ...inscrito, presente: !presente }
+            ? { ...inscrito, status_inscricao: novoStatus }
             : inscrito
         )
       );
@@ -356,15 +358,15 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
                         variant="ghost"
                         size="icon"
                         onClick={() =>
-                          handleTogglePresenca(inscrito.id, inscrito.presente)
+                          handleTogglePresenca(inscrito.id, inscrito.status_inscricao)
                         }
                         className={
-                          inscrito.presente
+                          inscrito.status_inscricao === "presente"
                             ? "text-green-500"
                             : "text-gray-500"
                         }
                       >
-                        {inscrito.presente ? (
+                        {inscrito.status_inscricao === "presente" ? (
                           <Check className="h-5 w-5" />
                         ) : (
                           <X className="h-5 w-5" />
