@@ -1,29 +1,14 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Evento, CasalEvento } from "../types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Loader2, Check, X, UserPlus, Trash2 } from "lucide-react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { Loader2, UserPlus } from "lucide-react";
+import AdicionarCasalDialog from "./AdicionarCasalDialog";
+import InscritosTable from "./InscritosTable";
 
 interface EventoInscritosProps {
   evento: Evento;
@@ -44,6 +29,7 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
 
   useEffect(() => {
     fetchInscritos();
+    // eslint-disable-next-line
   }, [evento]);
 
   const fetchInscritos = async () => {
@@ -97,7 +83,6 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
   const fetchCasaisDisponiveis = async () => {
     setLoadingCasais(true);
     try {
-      // Primeiro, buscamos os IDs dos casais já inscritos neste evento
       const { data: inscritosData, error: inscritosError } = await supabase
         .from("casal_evento")
         .select("id_inscricao")
@@ -105,10 +90,8 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
 
       if (inscritosError) throw inscritosError;
 
-      // Lista de IDs já inscritos
       const idsInscritos = inscritosData.map((item) => item.id_inscricao);
 
-      // Agora, buscamos todos os casais que não estão na lista de inscritos
       const { data, error } = await supabase
         .from("inscricoes")
         .select(`
@@ -123,16 +106,13 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
 
       if (error) throw error;
 
-      // Filtrar casais que não estão inscritos neste evento
       const casaisNaoInscritos = data.filter(
         (item) => !idsInscritos.includes(item.id_inscricao)
       );
 
-      // Processar os dados para o formato adequado
       const processedData = casaisNaoInscritos.map((item) => {
         const esposo = item.pessoas.find((p: any) => p.sexo === 'M');
         const esposa = item.pessoas.find((p: any) => p.sexo === 'F');
-
         return {
           id_inscricao: item.id_inscricao,
           codigo_casal: item.codigo_casal,
@@ -184,7 +164,6 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
         description: "O casal foi adicionado ao evento com sucesso.",
       });
 
-      // Resetar estado e recarregar inscritos
       setSelectedCasal(null);
       setObservacoes("");
       setShowAddDialog(false);
@@ -202,7 +181,6 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
   };
 
   const handleTogglePresenca = async (id: string, status_inscricao: string | null | undefined) => {
-    // Alternar entre "presente" e "ausente"
     const novoStatus = status_inscricao === "presente" ? "ausente" : "presente";
     try {
       const { error } = await supabase
@@ -212,7 +190,6 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
 
       if (error) throw error;
 
-      // Atualizar estado local para refletir a mudança
       setInscritos(
         inscritos.map((inscrito) =>
           inscrito.id === id
@@ -244,7 +221,6 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
 
       if (error) throw error;
 
-      // Remover do estado local
       setInscritos(inscritos.filter((inscrito) => inscrito.id !== id));
 
       toast({
@@ -258,14 +234,6 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
         description: error.message,
         variant: "destructive",
       });
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), "dd/MM/yyyy", { locale: ptBR });
-    } catch (e) {
-      return dateString;
     }
   };
 
@@ -291,8 +259,7 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
             Casais Inscritos
           </CardTitle>
           <p className="text-gray-500 mt-1">
-            {evento.titulo} - {formatDate(evento.data_inicio)} a{" "}
-            {formatDate(evento.data_fim)}
+            {evento.titulo} - {evento.data_inicio} a {evento.data_fim}
           </p>
         </div>
         <div className="flex space-x-2">
@@ -314,173 +281,25 @@ const EventoInscritos = ({ evento, onBack }: EventoInscritosProps) => {
             className="max-w-md"
           />
         </div>
-
-        {loading ? (
-          <div className="flex justify-center items-center py-8">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="ml-2">Carregando inscritos...</p>
-          </div>
-        ) : filteredInscritos.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-gray-500">Nenhum casal inscrito encontrado.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Código</TableHead>
-                  <TableHead>Esposo</TableHead>
-                  <TableHead>Esposa</TableHead>
-                  <TableHead>Data Inscrição</TableHead>
-                  <TableHead>Presente</TableHead>
-                  <TableHead>Observações</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredInscritos.map((inscrito) => (
-                  <TableRow key={inscrito.id}>
-                    <TableCell className="font-medium">
-                      {inscrito.casal?.codigo_casal || "-"}
-                    </TableCell>
-                    <TableCell>
-                      {inscrito.casal?.esposo?.nome_completo || "Não informado"}
-                    </TableCell>
-                    <TableCell>
-                      {inscrito.casal?.esposa?.nome_completo || "Não informado"}
-                    </TableCell>
-                    <TableCell>
-                      {formatDate(inscrito.data_inscricao)}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() =>
-                          handleTogglePresenca(
-                            inscrito.id,
-                            inscrito.status_inscricao
-                          )
-                        }
-                        className={
-                          inscrito.status_inscricao === "presente"
-                            ? "text-green-500"
-                            : "text-gray-500"
-                        }
-                      >
-                        {inscrito.status_inscricao === "presente" ? (
-                          <Check className="h-5 w-5" />
-                        ) : (
-                          <X className="h-5 w-5" />
-                        )}
-                      </Button>
-                    </TableCell>
-                    <TableCell>
-                      {inscrito.observacoes || "-"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleRemoveInscricao(inscrito.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
+        <InscritosTable
+          inscritos={filteredInscritos}
+          loading={loading}
+          onTogglePresenca={handleTogglePresenca}
+          onRemove={handleRemoveInscricao}
+        />
       </CardContent>
-
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Adicionar Casal ao Evento</DialogTitle>
-          </DialogHeader>
-
-          <div className="mt-4">
-            {loadingCasais ? (
-              <div className="flex justify-center items-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="ml-2">Carregando casais disponíveis...</p>
-              </div>
-            ) : casaisDisponiveis.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500">
-                  Todos os casais já estão inscritos neste evento.
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto max-h-[300px] overflow-y-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[50px]"></TableHead>
-                        <TableHead>Código</TableHead>
-                        <TableHead>Esposo</TableHead>
-                        <TableHead>Esposa</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {casaisDisponiveis.map((casal) => (
-                        <TableRow key={casal.id_inscricao}>
-                          <TableCell>
-                            <Checkbox
-                              checked={selectedCasal === casal.id_inscricao}
-                              onCheckedChange={() => setSelectedCasal(casal.id_inscricao)}
-                            />
-                          </TableCell>
-                          <TableCell>{casal.codigo_casal}</TableCell>
-                          <TableCell>{casal.esposo}</TableCell>
-                          <TableCell>{casal.esposa}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-
-                <div className="mt-4 space-y-2">
-                  <label htmlFor="observacoes" className="block text-sm font-medium">
-                    Observações
-                  </label>
-                  <Textarea
-                    id="observacoes"
-                    placeholder="Observações sobre a inscrição do casal..."
-                    value={observacoes}
-                    onChange={(e) => setObservacoes(e.target.value)}
-                  />
-                </div>
-
-                <div className="flex justify-end mt-4 space-x-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowAddDialog(false)}
-                    disabled={savingInscricao}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button onClick={handleAddInscricao} disabled={!selectedCasal || savingInscricao}>
-                    {savingInscricao ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Adicionando...
-                      </>
-                    ) : (
-                      "Adicionar"
-                    )}
-                  </Button>
-                </div>
-              </>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <AdicionarCasalDialog
+        open={showAddDialog}
+        onOpenChange={setShowAddDialog}
+        casaisDisponiveis={casaisDisponiveis}
+        loadingCasais={loadingCasais}
+        selectedCasal={selectedCasal}
+        setSelectedCasal={setSelectedCasal}
+        observacoes={observacoes}
+        setObservacoes={setObservacoes}
+        savingInscricao={savingInscricao}
+        onAddInscricao={handleAddInscricao}
+      />
     </Card>
   );
 };
