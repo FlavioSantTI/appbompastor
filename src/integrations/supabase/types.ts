@@ -391,20 +391,20 @@ export type Database = {
         }
         Relationships: []
       }
-      statusInscricao: {
+      status_inscricao: {
         Row: {
           created_at: string
-          Descricao: string | null
+          descricao: string | null
           id: number
         }
         Insert: {
           created_at?: string
-          Descricao?: string | null
+          descricao?: string | null
           id?: number
         }
         Update: {
           created_at?: string
-          Descricao?: string | null
+          descricao?: string | null
           id?: number
         }
         Relationships: []
