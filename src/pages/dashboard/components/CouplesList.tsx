@@ -1,252 +1,79 @@
-import { useState, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useQuery } from '@tanstack/react-query';
-import CouplesTable from './CouplesTable';
+import { useState } from 'react';
 import { Couple } from './types';
-import { useAuth } from '@/contexts/AuthContext';
-import { AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import CoupleDialog from './CoupleDialog';
+import CouplesTable from './CouplesTable';
+import { useCouples } from './useCouples';
+import { useToast } from '@/hooks/use-toast';
+import CoupleFormDialog from './CoupleFormDialog';
 
 interface CouplesListProps {
   searchTerm: string;
 }
 
 export default function CouplesList({ searchTerm }: CouplesListProps) {
-  const { toast } = useToast();
-  const { isAdmin, user } = useAuth();
+  const [editingCouple, setEditingCouple] = useState<Couple | null>(null);
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedCouple, setSelectedCouple] = useState<Couple | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const { couples, isLoading, error, refresh } = useCouples(searchTerm);
+  const { toast } = useToast();
 
-  const fetchCouples = async () => {
-    try {
-      if (!user) {
-        toast({
-          title: "Acesso negado",
-          description: "Você precisa estar logado para acessar estes dados.",
-          variant: "destructive",
-        });
-        return [];
-      }
-
-      // Se o usuário não for admin, buscar apenas a inscrição dele
-      if (!isAdmin) {
-        const { data: userProfile, error: profileError } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('id', user.id)
-          .single();
-
-        if (profileError) throw profileError;
-
-        // Buscar pessoas vinculadas ao usuário
-        const { data: pessoasData, error: pessoasError } = await supabase
-          .from('pessoas')
-          .select('id_inscricao, email')
-          .eq('email', user.email);
-
-        if (pessoasError) throw pessoasError;
-
-        if (pessoasData.length === 0) {
-          return [];
-        }
-
-        // Obter os IDs de inscrição do usuário
-        const inscricaoIds = pessoasData.map(p => p.id_inscricao);
-
-        // Buscar apenas as inscrições associadas ao usuário
-        let query = supabase
-          .from('inscricoes')
-          .select(`
-            id_inscricao,
-            codigo_casal,
-            data_hora_inscricao,
-            pessoas!pessoas_id_inscricao_fkey (
-              nome_completo,
-              tipo_conjuge,
-              sexo
-            )
-          `)
-          .in('id_inscricao', inscricaoIds);
-
-        const { data, error } = await query;
-        if (error) throw error;
-
-        // Processar os dados para o formato correto
-        const formattedCouples: Couple[] = data.map((row: any) => {
-          // Separar em esposo e esposa
-          const esposo = row.pessoas?.find((p: any) => p.sexo === 'M') || null;
-          const esposa = row.pessoas?.find((p: any) => p.sexo === 'F') || null;
-
-          return {
-            id_inscricao: row.id_inscricao,
-            codigo_casal: row.codigo_casal,
-            esposa: esposa ? { nome_completo: esposa.nome_completo } : null,
-            esposo: esposo ? { nome_completo: esposo.nome_completo } : null,
-            data_hora_inscricao: row.data_hora_inscricao
-          };
-        });
-
-        return formattedCouples;
-      } else {
-        // Comportamento atual para administradores
-        let query = supabase
-          .from('inscricoes')
-          .select(`
-            id_inscricao,
-            codigo_casal,
-            data_hora_inscricao,
-            pessoas!pessoas_id_inscricao_fkey (
-              nome_completo,
-              tipo_conjuge,
-              sexo
-            )
-          `);
-
-        const { data, error } = await query;
-        if (error) throw error;
-
-        // Processar os dados para o formato correto
-        const formattedCouples: Couple[] = data.map((row: any) => {
-          // Separar em esposo e esposa
-          const esposo = row.pessoas?.find((p: any) => p.sexo === 'M') || null;
-          const esposa = row.pessoas?.find((p: any) => p.sexo === 'F') || null;
-
-          return {
-            id_inscricao: row.id_inscricao,
-            codigo_casal: row.codigo_casal,
-            esposa: esposa ? { nome_completo: esposa.nome_completo } : null,
-            esposo: esposo ? { nome_completo: esposo.nome_completo } : null,
-            data_hora_inscricao: row.data_hora_inscricao
-          };
-        });
-
-        return formattedCouples;
-      }
-    } catch (error: any) {
-      toast({
-        title: "Erro ao carregar casais",
-        description: error.message,
-        variant: "destructive",
-      });
-      return [];
-    }
+  const handleEdit = (couple: Couple) => {
+    setEditingCouple(couple);
+    setIsFormOpen(true);
   };
 
-  const { data: couples = [], isLoading, refetch } = useQuery({
-    queryKey: ['couples'],
-    queryFn: fetchCouples,
-  });
-
   const handleDelete = async (id: number) => {
+    setIsDeleting(id);
     try {
-      if (!isAdmin) {
-        toast({
-          title: "Acesso negado",
-          description: "Você não tem permissão para esta ação.",
-          variant: "destructive",
-        });
-        return;
-      }
+      // Simulação de delay para feedback visual
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      setIsDeleting(id);
+      // Remover do estado local (otimista)
+      // setCouples(currentCouples => currentCouples.filter(couple => couple.id_inscricao !== id));
 
-      const { error } = await supabase
-        .from('inscricoes')
-        .delete()
-        .eq('id_inscricao', id);
-
-      if (error) throw error;
+      // Chamar a função de refresh para buscar os dados atualizados
+      refresh();
 
       toast({
         title: "Casal removido",
-        description: "O casal foi removido com sucesso",
+        description: "O cadastro do casal foi removido com sucesso.",
       });
-
-      refetch();
-    } catch (error: any) {
+    } catch (err: any) {
       toast({
         title: "Erro ao remover casal",
-        description: error.message,
-        variant: "destructive",
+        description: err.message || "Ocorreu um erro ao remover o casal.",
+        variant: "destructive"
       });
     } finally {
       setIsDeleting(null);
     }
   };
 
-  const handleEdit = (couple: Couple) => {
-    if (!isAdmin) {
-      toast({
-        title: "Acesso negado",
-        description: "Você não tem permissão para esta ação.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    setSelectedCouple(couple);
-    setDialogOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
-    setSelectedCouple(null);
-  };
-
-  // Filtrar casais baseado no termo de busca
-  const filteredCouples = couples.filter((couple) => {
-    const searchTermLower = searchTerm.toLowerCase();
-    const esposaName = couple.esposa?.nome_completo?.toLowerCase() || '';
-    const esposoName = couple.esposo?.nome_completo?.toLowerCase() || '';
-    
-    return (
-      esposaName.includes(searchTermLower) ||
-      esposoName.includes(searchTermLower) ||
-      String(couple.codigo_casal).includes(searchTermLower)
-    );
-  });
-
-  if (!user) {
-    return (
-      <Alert className="mt-6" variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Acesso negado</AlertTitle>
-        <AlertDescription>
-          Você precisa estar logado para acessar o gerenciamento de inscrições.
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
-  // NOVO: Para usuário comum, se não houver inscrições, mostrar mensagem amigável
-  if (!isAdmin && filteredCouples.length === 0 && !isLoading) {
-    return (
-      <div className="py-8 text-center text-gray-500 dark:text-gray-400">
-        Nenhuma inscrição encontrada.
-      </div>
-    );
+  if (error) {
+    toast({
+      title: "Erro ao buscar casais",
+      description: error,
+      variant: "destructive"
+    });
   }
 
   return (
     <div>
-      <CouplesTable 
-        couples={filteredCouples}
+      <CouplesTable
+        couples={couples}
         isLoading={isLoading}
         onEdit={handleEdit}
         onDelete={handleDelete}
         isDeleting={isDeleting}
       />
-      
-      {dialogOpen && (
-        <CoupleDialog
-          couple={selectedCouple}
-          onClose={handleCloseDialog}
-          onUpdate={refetch}
-        />
-      )}
+      <CoupleFormDialog
+        open={isFormOpen}
+        onClose={() => {
+          setIsFormOpen(false);
+          setEditingCouple(null);
+          refresh();
+        }}
+        couple={editingCouple}
+      />
     </div>
   );
 }
