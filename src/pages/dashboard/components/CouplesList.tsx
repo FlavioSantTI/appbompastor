@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Couple } from './types';
 import CouplesTable from './CouplesTable';
@@ -26,10 +27,6 @@ export default function CouplesList({ searchTerm }: CouplesListProps) {
     try {
       // Simulação de delay para feedback visual
       await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Remover do estado local (otimista)
-      // setCouples(currentCouples => currentCouples.filter(couple => couple.id_inscricao !== id));
-
       // Chamar a função de refresh para buscar os dados atualizados
       refresh();
 
@@ -72,7 +69,7 @@ export default function CouplesList({ searchTerm }: CouplesListProps) {
           setEditingCouple(null);
           refresh();
         }}
-        couple={editingCouple}
+        // Se quiser passar editingCouple como inicialização, altere a tipagem de CoupleFormDialog e trate internamente
       />
     </div>
   );
