@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
@@ -158,7 +157,6 @@ export default function CoupleFormDialog({ open, onClose }: CoupleFormDialogProp
       });
       return;
     }
-
     if (!selectedEvento) {
       toast({
         title: "Evento não selecionado",
@@ -167,31 +165,20 @@ export default function CoupleFormDialog({ open, onClose }: CoupleFormDialogProp
       });
       return;
     }
-    
     setIsSubmitting(true);
 
     try {
-      // Cadastrar o casal
-      const inscricaoId = await submitCoupleForm(wifeData, husbandData, coupleData);
-      
-      // Vincular o casal ao evento selecionado
-      const { error: eventoError } = await supabase
-        .from('casal_evento')
-        .insert({
-          id_inscricao: inscricaoId,
-          id_evento: selectedEvento,
-        });
-      
-      if (eventoError) throw eventoError;
-      
+      // Cadastrar o casal E VINCULAR ao evento selecionado via submitCoupleForm atualizado
+      const inscricaoId = await submitCoupleForm(wifeData, husbandData, coupleData, selectedEvento);
+
       toast({
         title: "Inscrição realizada com sucesso!",
         description: `A inscrição do casal foi cadastrada com sucesso.`
       });
-      
+
       // Atualizar a lista de casais
       queryClient.invalidateQueries({ queryKey: ['couples'] });
-      
+
       handleClose();
     } catch (error: any) {
       console.error('Erro ao cadastrar casal:', error);

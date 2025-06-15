@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { WifeData } from '@/features/form/components/WifeForm';
 import { HusbandData } from '@/features/form/components/HusbandForm';
@@ -7,7 +6,8 @@ import { CoupleData } from '@/features/form/components/CoupleForm';
 export const submitCoupleForm = async (
   wifeData: WifeData, 
   husbandData: HusbandData, 
-  coupleData: CoupleData
+  coupleData: CoupleData,
+  eventoId: string
 ): Promise<number> => {
   // 1. Inserir a inscrição do casal
   const { data: inscricaoData, error: inscricaoError } = await supabase
@@ -26,6 +26,16 @@ export const submitCoupleForm = async (
   
   const inscricaoId = inscricaoData[0].id_inscricao;
   
+  // 1a. Vincular inscrição ao evento na tabela casal_evento
+  const { error: casalEventoError } = await supabase
+    .from('casal_evento')
+    .insert({
+      id_inscricao: inscricaoId,
+      id_evento: eventoId,
+      // demais campos possuem default
+    });
+  if (casalEventoError) throw casalEventoError;
+
   // 2. Inserir endereço - Usando o nome de coluna correto 'cep'
   const { error: enderecoError } = await supabase
     .from('enderecos')

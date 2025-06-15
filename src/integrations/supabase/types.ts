@@ -16,7 +16,7 @@ export type Database = {
           id_evento: string
           id_inscricao: number
           observacoes: string | null
-          presente: boolean | null
+          status_inscricao: string | null
         }
         Insert: {
           data_inscricao?: string
@@ -24,7 +24,7 @@ export type Database = {
           id_evento: string
           id_inscricao: number
           observacoes?: string | null
-          presente?: boolean | null
+          status_inscricao?: string | null
         }
         Update: {
           data_inscricao?: string
@@ -32,7 +32,7 @@ export type Database = {
           id_evento?: string
           id_inscricao?: number
           observacoes?: string | null
-          presente?: boolean | null
+          status_inscricao?: string | null
         }
         Relationships: [
           {
@@ -374,6 +374,24 @@ export type Database = {
         Update: {
           id_sacramento?: number
           nome_sacramento?: string
+        }
+        Relationships: []
+      }
+      statusInscricao: {
+        Row: {
+          created_at: string
+          Descricao: string | null
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          Descricao?: string | null
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          Descricao?: string | null
+          id?: number
         }
         Relationships: []
       }
