@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,13 +37,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
-      
+        .maybeSingle();
+
       if (error) {
         console.error('Erro ao buscar perfil:', error);
         return;
       }
-      
+
       setProfile(data);
     } catch (error) {
       console.error('Erro ao buscar perfil:', error);
@@ -52,15 +51,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    // Configurar listener para mudanças de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
         console.log("Auth state changed:", event, currentSession);
-        // Atualizar estado local com os dados da sessão
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
 
-        // Se tiver um usuário autenticado, buscar o perfil
         if (currentSession?.user) {
           setTimeout(() => {
             fetchProfile(currentSession.user.id);
@@ -69,7 +65,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setProfile(null);
         }
 
-        // Mostrar mensagens de toast para eventos de login/logout
         if (event === 'SIGNED_IN') {
           toast({
             title: "Login bem-sucedido",
@@ -84,13 +79,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    // Verificar sessão inicial
     supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
       console.log("Initial session:", initialSession);
       setSession(initialSession);
       setUser(initialSession?.user ?? null);
       
-      // Se tiver um usuário autenticado, buscar o perfil
       if (initialSession?.user) {
         fetchProfile(initialSession.user.id);
       }

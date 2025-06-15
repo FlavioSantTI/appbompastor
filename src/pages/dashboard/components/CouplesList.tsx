@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -219,6 +218,15 @@ export default function CouplesList({ searchTerm }: CouplesListProps) {
           Você precisa estar logado para acessar o gerenciamento de inscrições.
         </AlertDescription>
       </Alert>
+    );
+  }
+
+  // NOVO: Para usuário comum, se não houver inscrições, mostrar mensagem amigável
+  if (!isAdmin && filteredCouples.length === 0 && !isLoading) {
+    return (
+      <div className="py-8 text-center text-gray-500 dark:text-gray-400">
+        Nenhuma inscrição encontrada.
+      </div>
     );
   }
 

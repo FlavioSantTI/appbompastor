@@ -86,6 +86,27 @@ export type Database = {
           },
         ]
       }
+      estado: {
+        Row: {
+          codigouf: number
+          nome: string
+          regiao: number
+          uf: string
+        }
+        Insert: {
+          codigouf: number
+          nome: string
+          regiao: number
+          uf: string
+        }
+        Update: {
+          codigouf?: number
+          nome?: string
+          regiao?: number
+          uf?: string
+        }
+        Relationships: []
+      }
       eventos: {
         Row: {
           cidade: string
@@ -228,6 +249,24 @@ export type Database = {
           },
         ]
       }
+      municipio: {
+        Row: {
+          codigo: number
+          nome: string
+          uf: string
+        }
+        Insert: {
+          codigo: number
+          nome: string
+          uf: string
+        }
+        Update: {
+          codigo?: number
+          nome?: string
+          uf?: string
+        }
+        Relationships: []
+      }
       pessoa_sacramento: {
         Row: {
           id_pessoa: number
@@ -343,6 +382,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_complete_schema: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
